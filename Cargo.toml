@@ -1,0 +1,29 @@
+[package]
+name = "msg2pdf"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Export a 1:1 iMessage/SMS conversation from chat.db to PDF"
+publish = false
+
+[[bin]]
+name = "msg2pdf"
+path = "src/main.rs"
+
+[dependencies]
+imessage-database = "=4.0.0"
+rusqlite = { version = "=0.39.0", features = ["blob", "bundled"] }
+chrono = "=0.4.44"
+
+clap = { version = "4", features = ["derive"] }
+dialoguer = { version = "0.12", features = ["fuzzy-select"] }
+printpdf = { version = "0.9", features = ["images", "jpeg", "png", "gif", "webp"] }
+ttf-parser = "0.25"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp"] }
+kamadak-exif = "0.6"
+twemoji-assets = { version = "1.5", default-features = false, features = ["png"] }
+unicode-segmentation = "1"
+anyhow = "1"
+
+[profile.release]
+lto = "thin"
