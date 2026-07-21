@@ -49,6 +49,10 @@ impl Directory {
     pub fn len(&self) -> usize {
         self.by_key.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.by_key.is_empty()
+    }
 }
 
 fn ingest(db_path: &std::path::Path, out: &mut HashMap<String, String>) -> Result<()> {
@@ -153,4 +157,43 @@ fn keys_for(handle: &str) -> Vec<String> {
         keys.push(format!("1{digits}"));
     }
     keys
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{compose_name, keys_for};
+
+    #[test]
+    fn email_keys_lowercase() {
+        assert_eq!(keys_for("Alice@Example.COM"), vec!["alice@example.com"]);
+    }
+
+    #[test]
+    fn phone_forms_share_a_key() {
+        let formatted = keys_for("+1 (555) 555-0123");
+        let bare = keys_for("5555550123");
+        // the 10-digit and 1+10-digit forms both resolve to a common lookup key
+        assert!(formatted.iter().any(|k| bare.contains(k)));
+        assert!(bare.contains(&"5555550123".to_string()));
+    }
+
+    #[test]
+    fn nickname_wins_over_name() {
+        let name = compose_name(
+            &Some("First".into()),
+            &Some("Last".into()),
+            &Some("Nick".into()),
+            &None,
+        );
+        assert_eq!(name.as_deref(), Some("Nick"));
+    }
+
+    #[test]
+    fn falls_back_to_org_then_nothing() {
+        assert_eq!(
+            compose_name(&None, &None, &None, &Some("Acme".into())).as_deref(),
+            Some("Acme")
+        );
+        assert_eq!(compose_name(&None, &None, &None, &None), None);
+    }
 }

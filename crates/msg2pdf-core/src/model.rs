@@ -14,6 +14,7 @@ use std::path::{Path, PathBuf};
 
 use crate::assets::AssetDir;
 use crate::load::ChatRef;
+use crate::progress::Progress;
 
 pub struct Bubble {
     pub from_me: bool,
@@ -65,8 +66,8 @@ pub fn build(
     chat: &ChatRef,
     db_path: &Path,
     assets: &AssetDir,
+    progress: &mut dyn FnMut(Progress),
 ) -> Result<Conversation> {
-    use std::io::Write;
     let offset = get_offset();
 
     let mut ctx = QueryContext::default();
@@ -74,8 +75,7 @@ pub fn build(
     chats.insert(chat.rowid);
     ctx.set_selected_chat_ids(chats);
 
-    eprint!("  streaming messages…");
-    let _ = std::io::stderr().flush();
+    progress(Progress::Streaming { count: 0 });
     let mut stmt = Message::stream_rows(db, &ctx).context("preparing message stream")?;
     let iter = stmt
         .query_map([], |row| Ok(Message::from_row(row)))
@@ -88,12 +88,11 @@ pub fn build(
             m.apply_body(body);
         }
         all.push(m);
-        if all.len() % 200 == 0 {
-            eprint!("\r  streaming messages… {}", all.len());
-            let _ = std::io::stderr().flush();
+        if all.len().is_multiple_of(200) {
+            progress(Progress::Streaming { count: all.len() });
         }
     }
-    eprintln!("\r  streamed {} messages                  ", all.len());
+    progress(Progress::Streamed { total: all.len() });
 
     // Reactions are bucketed by (target_guid, component_index) so we can route them
     // to the right virtual bubble (image vs. text) when a message is split.
@@ -136,11 +135,11 @@ pub fn build(
         })
         .collect();
 
-    eprintln!(
-        "  split: {} regular · {} tapbacks",
+    progress(Progress::Note(format!(
+        "split: {} regular · {} tapbacks",
         regular.len(),
         tapbacks.values().map(|v| v.len()).sum::<usize>()
-    );
+    )));
 
     // Determine the layout of body components for each message: which component
     // index is the image (if any) and which is the text. Used to split messages
@@ -188,11 +187,12 @@ pub fn build(
             &mut image_count,
         )?;
         if last_log.elapsed() >= std::time::Duration::from_millis(500) {
-            use std::io::Write;
-            eprint!(
-                "\r  building bubbles… {idx}/{total} · {attach_count} attachments · {image_count} images prepared"
-            );
-            let _ = std::io::stderr().flush();
+            progress(Progress::Building {
+                done: idx,
+                total,
+                attachments: attach_count,
+                images: image_count,
+            });
             last_log = std::time::Instant::now();
         }
 
@@ -215,10 +215,10 @@ pub fn build(
         // Reactions targeting a specific component
         let take_reactions = |comp: Option<usize>| -> Vec<Reaction> {
             let mut out = Vec::new();
-            if let Some(c) = comp {
-                if let Some(rs) = tapbacks.get(&(m.guid.clone(), c)) {
-                    out.extend(rs.iter().cloned());
-                }
+            if let Some(c) = comp
+                && let Some(rs) = tapbacks.get(&(m.guid.clone(), c))
+            {
+                out.extend(rs.iter().cloned());
             }
             out
         };
@@ -234,7 +234,7 @@ pub fn build(
         if has_text && has_attachments {
             // Image bubble first (caption-style), then text bubble.
             let mut image_rs = take_reactions(image_idx);
-            image_rs.extend(leftover_reactions.iter().cloned().take(0));
+            image_rs.extend(leftover_reactions.iter().take(0).cloned());
             bubbles.push(Bubble {
                 from_me: m.is_from_me,
                 sent_at,
@@ -288,12 +288,11 @@ pub fn build(
         }
     }
 
-    eprintln!(
-        "\r  built {} bubbles · {} attachments · {} images prepared            ",
-        bubbles.len(),
-        attach_count,
-        image_count
-    );
+    progress(Progress::Built {
+        bubbles: bubbles.len(),
+        attachments: attach_count,
+        images: image_count,
+    });
 
     for i in 0..bubbles.len() {
         if bubbles[i].from_me {

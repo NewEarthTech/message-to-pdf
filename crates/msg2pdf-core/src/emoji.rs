@@ -92,22 +92,23 @@ pub fn wrap_tokens(tokens: Vec<Token>, max_w: f32, m: &Metrics, size: f32) -> Ve
             }
             ref t @ (Token::Word(_) | Token::Emoji(_)) => {
                 let w = token_width(t, m, size);
-                if w > max_w && current.is_empty() {
-                    if let Token::Word(s) = &tok {
-                        for c in s.chars() {
-                            let cw = m.char_width_pt(c, size);
-                            if current_w + cw > max_w && !current.is_empty() {
-                                while matches!(current.last(), Some(Token::Space)) {
-                                    current.pop();
-                                }
-                                lines.push(std::mem::take(&mut current));
-                                current_w = 0.0;
+                if w > max_w
+                    && current.is_empty()
+                    && let Token::Word(s) = &tok
+                {
+                    for c in s.chars() {
+                        let cw = m.char_width_pt(c, size);
+                        if current_w + cw > max_w && !current.is_empty() {
+                            while matches!(current.last(), Some(Token::Space)) {
+                                current.pop();
                             }
-                            current.push(Token::Word(c.to_string()));
-                            current_w += cw;
+                            lines.push(std::mem::take(&mut current));
+                            current_w = 0.0;
                         }
-                        continue;
+                        current.push(Token::Word(c.to_string()));
+                        current_w += cw;
                     }
+                    continue;
                 }
                 if current_w + w > max_w && !current.is_empty() {
                     while matches!(current.last(), Some(Token::Space)) {

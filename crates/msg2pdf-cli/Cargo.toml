@@ -1,0 +1,17 @@
+[package]
+name = "msg2pdf-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Export a 1:1 iMessage/SMS conversation from chat.db to PDF"
+publish = false
+
+[[bin]]
+name = "msg2pdf"
+path = "src/main.rs"
+
+[dependencies]
+msg2pdf-core = { path = "../msg2pdf-core" }
+anyhow = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+dialoguer = { version = "0.12", features = ["fuzzy-select"] }
