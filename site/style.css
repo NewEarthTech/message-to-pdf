@@ -1,0 +1,113 @@
+/* Sheaf landing — static, dependency-free. Brand: indigo #3a54d6 / #5b7cfa. */
+:root {
+  --ink: #16181d;
+  --ink-2: #5b616e;
+  --ink-3: #8b909c;
+  --line: #e7e8ee;
+  --bg: #ffffff;
+  --bg-2: #f7f8fc;
+  --brand: #3a54d6;
+  --brand-2: #5b7cfa;
+  --brand-ink: #2b3ea8;
+  --radius: 14px;
+  --wrap: 1080px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; color: var(--ink); }
+p { color: var(--ink-2); }
+
+/* nav */
+.nav { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.82); backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 650; font-size: 17px; color: var(--ink); }
+.brand:hover { text-decoration: none; }
+.brand img { width: 26px; height: 26px; border-radius: 6px; }
+.nav .spacer { flex: 1; }
+.nav a.link { color: var(--ink-2); font-size: 14.5px; }
+.nav a.link:hover { color: var(--ink); text-decoration: none; }
+.btn { display: inline-block; background: var(--brand); color: #fff; font-weight: 550; font-size: 15px; padding: 9px 18px; border-radius: 10px; border: none; cursor: pointer; transition: background .15s; }
+.btn:hover { background: var(--brand-ink); text-decoration: none; color: #fff; }
+.btn.lg { font-size: 16.5px; padding: 13px 26px; border-radius: 12px; }
+.btn.ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { background: var(--bg-2); color: var(--ink); }
+
+/* hero */
+.hero { text-align: center; padding: 76px 0 40px; background: radial-gradient(1200px 500px at 50% -10%, #eef1fe 0%, #ffffff 60%); }
+.hero h1 { font-size: 52px; font-weight: 720; max-width: 15ch; margin: 0 auto; }
+.hero .sub { font-size: 20px; color: var(--ink-2); max-width: 44ch; margin: 20px auto 0; }
+.cta { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 30px; flex-wrap: wrap; }
+.price-note { color: var(--ink-3); font-size: 14.5px; }
+.trust { margin-top: 20px; color: var(--ink-3); font-size: 13.5px; letter-spacing: .01em; }
+.shot { max-width: 1000px; margin: 44px auto 0; padding: 0 24px; }
+.shot img { width: 100%; height: auto; display: block; border-radius: var(--radius); }
+
+/* sections */
+section { padding: 64px 0; }
+.section-head { text-align: center; max-width: 40ch; margin: 0 auto 44px; }
+.section-head h2 { font-size: 34px; font-weight: 680; }
+.section-head p { font-size: 18px; margin-top: 12px; }
+.eyebrow { color: var(--brand); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+.card h3 { font-size: 19px; font-weight: 620; }
+.card p { margin-top: 8px; font-size: 15.5px; }
+.card .ic { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--brand-2), var(--brand)); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: #fff; font-size: 20px; }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: step; }
+.step { text-align: left; }
+.step .n { width: 30px; height: 30px; border-radius: 50%; background: #eef1fe; color: var(--brand-ink); font-weight: 650; font-size: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.step h3 { font-size: 17px; font-weight: 620; }
+.step p { margin-top: 6px; font-size: 15px; }
+
+.band { background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.band .wrap { text-align: center; }
+.band h2 { font-size: 30px; font-weight: 680; }
+.band p { font-size: 18px; margin: 14px auto 0; max-width: 52ch; }
+
+.pricebox { max-width: 460px; margin: 0 auto; text-align: center; background: var(--bg); border: 1px solid var(--line); border-radius: 18px; padding: 40px 32px; box-shadow: 0 20px 50px -30px rgba(43,62,168,.4); }
+.pricebox .amt { font-size: 56px; font-weight: 720; letter-spacing: -0.03em; }
+.pricebox .amt small { font-size: 20px; color: var(--ink-3); font-weight: 500; }
+.pricebox ul { list-style: none; margin: 22px 0; text-align: left; display: inline-block; }
+.pricebox li { color: var(--ink-2); font-size: 15.5px; padding: 5px 0 5px 28px; position: relative; }
+.pricebox li::before { content: "✓"; color: var(--brand); position: absolute; left: 0; font-weight: 700; }
+
+/* legal / content pages */
+.doc { padding: 56px 0 72px; }
+.doc .wrap { max-width: 760px; }
+.doc h1 { font-size: 38px; font-weight: 700; }
+.doc .updated { color: var(--ink-3); font-size: 14px; margin-top: 8px; }
+.doc h2 { font-size: 22px; font-weight: 650; margin: 40px 0 10px; }
+.doc h3 { font-size: 17px; font-weight: 620; margin: 26px 0 6px; }
+.doc p, .doc li { font-size: 16px; color: var(--ink-2); }
+.doc p { margin-top: 12px; }
+.doc ul { margin: 12px 0 0 22px; }
+.doc li { margin-top: 6px; }
+.doc .lead { font-size: 18px; color: var(--ink); }
+
+/* footer */
+footer { border-top: 1px solid var(--line); padding: 40px 0; color: var(--ink-3); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center; }
+footer a { color: var(--ink-2); }
+footer .spacer { flex: 1; }
+footer .muted { color: var(--ink-3); }
+
+@media (max-width: 720px) {
+  .hero h1 { font-size: 36px; }
+  .hero .sub { font-size: 18px; }
+  .grid, .steps { grid-template-columns: 1fr; }
+  .nav a.link.hide-sm { display: none; }
+  .section-head h2 { font-size: 27px; }
+}
