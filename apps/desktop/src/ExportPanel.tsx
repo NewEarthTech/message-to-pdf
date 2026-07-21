@@ -1,7 +1,8 @@
 import { Channel } from "@tauri-apps/api/core"
+import { desktopDir } from "@tauri-apps/api/path"
 import { open } from "@tauri-apps/plugin-dialog"
 import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { type Conversation, type ExportResult, ipc, type ProgressEvent } from "./bindings"
 import { nextDay } from "./format"
 
@@ -11,18 +12,32 @@ type ExportState =
   | { status: "done"; result: ExportResult }
   | { status: "error"; message: string }
 
+// Persisted so the destination sticks across conversation switches and restarts.
+const OUT_DIR_KEY = "msg2pdf.outDir"
+
 // Keyed on the conversation rowid by the parent, so all state resets on selection change.
 export function ExportPanel({ conversation }: { conversation: Conversation }) {
-  const [outDir, setOutDir] = useState<string | null>(null)
+  const [outDir, setOutDir] = useState<string | null>(() => localStorage.getItem(OUT_DIR_KEY))
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
   const [state, setState] = useState<ExportState>({ status: "idle" })
 
+  // With no remembered folder, default to the Desktop (best-effort).
+  useEffect(() => {
+    if (localStorage.getItem(OUT_DIR_KEY)) return
+    desktopDir()
+      .then(setOutDir)
+      .catch(() => {})
+  }, [])
+
   const exporting = state.status === "exporting"
 
   async function chooseFolder() {
-    const dir = await open({ directory: true, multiple: false })
-    if (typeof dir === "string") setOutDir(dir)
+    const dir = await open({ directory: true, multiple: false, defaultPath: outDir ?? undefined })
+    if (typeof dir === "string") {
+      setOutDir(dir)
+      localStorage.setItem(OUT_DIR_KEY, dir)
+    }
   }
 
   async function runExport() {
