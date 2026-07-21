@@ -1,9 +1,7 @@
-// Central product identity. The codename is `msg2pdf` until the launch name is
-// chosen; renaming then touches this file plus tauri.conf.json (productName,
-// window title, identifier) and the capability's source URL — see the rename
-// checklist in .claude/state.md. Cargo crate and binary names are internal and
-// deliberately stay `msg2pdf`.
-export const PRODUCT_NAME = "msg2pdf"
+// Central product identity. The product name is `Sheaf`; keep it in sync with
+// tauri.conf.json (productName, window title, identifier). The Cargo crate and
+// binary names are internal and deliberately stay `msg2pdf`.
+export const PRODUCT_NAME = "Sheaf"
 
 export const PRODUCT_TAGLINE = "Export an iMessage conversation to PDF"
 
