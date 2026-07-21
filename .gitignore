@@ -3,6 +3,15 @@
 # Generated exports — never commit private conversation data.
 *.pdf
 *.html
+# …but the desktop app's Vite entry point is source, not an export.
+!apps/desktop/index.html
+
+# Generated fixture databases — schema.sql + seed.sql are the source of truth.
+*.db
+
+# Desktop app frontend
+node_modules/
+dist/
 
 # Local Claude Code config
 CLAUDE.md

@@ -1,0 +1,26 @@
+[package]
+name = "msg2pdf-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "msg2pdf desktop app"
+publish = false
+
+[lib]
+name = "msg2pdf_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = "2"
+
+[dependencies]
+msg2pdf-core = { path = "../../../crates/msg2pdf-core" }
+msg2pdf-fixture = { path = "../../../crates/msg2pdf-fixture" }
+tauri = "2"
+tauri-typed-ipc = "=0.1.6"
+specta = { version = "=2.0.0-rc.25", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+
+[features]
+# Enables TypeScript-client generation and the drift check (pulls specta-typescript).
+export = ["tauri-typed-ipc/export"]
