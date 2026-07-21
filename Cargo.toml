@@ -1,6 +1,11 @@
 [workspace]
 resolver = "2"
-members = ["crates/msg2pdf-core", "crates/msg2pdf-cli", "crates/msg2pdf-fixture"]
+members = [
+  "crates/msg2pdf-core",
+  "crates/msg2pdf-cli",
+  "crates/msg2pdf-fixture",
+  "apps/desktop/src-tauri"
+]
 
 [workspace.package]
 version = "0.1.0"
