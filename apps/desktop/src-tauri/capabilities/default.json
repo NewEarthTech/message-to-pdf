@@ -9,6 +9,10 @@
     "core:default",
     "dialog:allow-open",
     "opener:allow-open-path",
-    "opener:allow-reveal-item-in-dir"
+    "opener:allow-reveal-item-in-dir",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "x-apple.systempreferences:*" }]
+    }
   ]
 }

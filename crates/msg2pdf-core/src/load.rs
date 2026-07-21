@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, anyhow, bail};
 use imessage_database::tables::table::get_connection;
-use rusqlite::Connection;
+use rusqlite::{Connection, OpenFlags};
 use std::path::{Path, PathBuf};
 
 use crate::contacts::Directory;
@@ -39,6 +39,33 @@ pub fn open(path: &Path) -> Result<Connection> {
             path.display()
         )
     })
+}
+
+/// Whether a `chat.db` at `path` can be read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Access {
+    /// Opened read-only successfully.
+    Readable,
+    /// The file exists but could not be opened. On macOS this is the Full Disk
+    /// Access case: `chat.db` is protected until the app is granted access.
+    Denied,
+    /// No file exists at that path.
+    Missing,
+}
+
+/// Probe whether `path` can be opened read-only, distinguishing "protected"
+/// (needs Full Disk Access) from "not there".
+pub fn check_access(path: &Path) -> Access {
+    if !path.exists() {
+        return Access::Missing;
+    }
+    match Connection::open_with_flags(
+        path,
+        OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
+    ) {
+        Ok(_) => Access::Readable,
+        Err(_) => Access::Denied,
+    }
 }
 
 pub fn resolve_contact(db: &Connection, contacts: &Directory, contact: &str) -> Result<ChatRef> {

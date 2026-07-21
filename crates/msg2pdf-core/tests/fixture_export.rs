@@ -92,3 +92,13 @@ fn build_respects_date_range() {
 
     std::fs::remove_file(&db_path).ok();
 }
+
+#[test]
+fn check_access_reports_readable_and_missing() {
+    let db_path = temp_path("access.db");
+    msg2pdf_fixture::create(&db_path).unwrap();
+    assert_eq!(load::check_access(&db_path), load::Access::Readable);
+
+    std::fs::remove_file(&db_path).ok();
+    assert_eq!(load::check_access(&db_path), load::Access::Missing);
+}

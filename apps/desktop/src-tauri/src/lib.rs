@@ -64,6 +64,15 @@ struct ExportResult {
     path: String,
 }
 
+/// Whether the configured `chat.db` can be read — drives Full Disk Access onboarding.
+#[derive(Serialize, specta::Type)]
+#[serde(rename_all = "lowercase")]
+enum AccessStatus {
+    Readable,
+    Denied,
+    Missing,
+}
+
 /// Collapse the engine's fine-grained [`Progress`] into a UI-friendly event.
 fn map_progress(ev: Progress) -> ProgressEvent {
     let fraction = |done: usize, total: usize| (total > 0).then(|| done as f64 / total as f64);
@@ -104,6 +113,9 @@ fn map_progress(ev: Progress) -> ProgressEvent {
 
 #[procedures]
 trait Ipc {
+    /// Whether the configured `chat.db` can be read. Drives Full Disk Access onboarding.
+    fn check_access(&self, state: State<AppState>) -> AccessStatus;
+
     /// List every 1:1 conversation in the configured `chat.db`, newest first.
     fn list_conversations(&self, state: State<AppState>) -> Result<Vec<Conversation>, String>;
 
@@ -124,6 +136,14 @@ trait Ipc {
 struct Backend;
 
 impl Ipc for Backend {
+    fn check_access(&self, state: State<AppState>) -> AccessStatus {
+        match load::check_access(&state.db_path) {
+            load::Access::Readable => AccessStatus::Readable,
+            load::Access::Denied => AccessStatus::Denied,
+            load::Access::Missing => AccessStatus::Missing,
+        }
+    }
+
     fn list_conversations(&self, state: State<AppState>) -> Result<Vec<Conversation>, String> {
         let db = load::open(&state.db_path).map_err(|e| e.to_string())?;
         let directory = contacts::Directory::load();
