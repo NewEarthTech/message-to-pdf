@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 const MAX_DIM_PX: u32 = 1200;
 
@@ -17,8 +18,15 @@ impl AssetDir {
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_nanos())
             .unwrap_or(0);
+        // A process-global sequence guarantees a distinct dir per `AssetDir`
+        // even when two are created in the same process within one clock tick
+        // (`SystemTime` is not nanosecond-granular on macOS). Without it,
+        // parallel export tests — or any concurrent exports — could share a
+        // root and race on both the `sips` output files and `Drop` cleanup.
+        static SEQ: AtomicU64 = AtomicU64::new(0);
+        let seq = SEQ.fetch_add(1, Ordering::Relaxed);
         let root = std::env::temp_dir().join(format!(
-            "msg2pdf-img-{}-{nanos}",
+            "msg2pdf-img-{}-{nanos}-{seq}",
             std::process::id()
         ));
         std::fs::create_dir_all(&root)
@@ -127,4 +135,18 @@ fn read_exif_orientation(path: &Path) -> Option<u32> {
     let exif = exif::Reader::new().read_from_container(&mut reader).ok()?;
     let field = exif.get_field(exif::Tag::Orientation, exif::In::PRIMARY)?;
     field.value.get_uint(0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::AssetDir;
+
+    #[test]
+    fn asset_dirs_get_distinct_roots() {
+        // Two dirs created back-to-back must never share a root, or their
+        // `sips` outputs and `Drop` cleanup would collide.
+        let a = AssetDir::new().unwrap();
+        let b = AssetDir::new().unwrap();
+        assert_ne!(a.root(), b.root());
+    }
 }
