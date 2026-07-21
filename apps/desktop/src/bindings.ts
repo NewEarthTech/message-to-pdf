@@ -3,6 +3,10 @@
 import { invoke, Channel } from "@tauri-apps/api/core";
 
 export const ipc = {
+  checkAccess(): Promise<AccessStatus> {
+    return invoke("check_access");
+  },
+
   /** @throws {string} */
   listConversations(): Promise<Conversation[]> {
     return invoke("list_conversations");
@@ -13,6 +17,9 @@ export const ipc = {
     return invoke("export_conversation", { rowid, out_dir: outDir, start, end, on_progress: onProgress });
   },
 };
+
+/**  Whether the configured `chat.db` can be read — drives Full Disk Access onboarding. */
+export type AccessStatus = "readable" | "denied" | "missing";
 
 /**
  *  One 1:1 conversation, as sent to the frontend list. Field names are
