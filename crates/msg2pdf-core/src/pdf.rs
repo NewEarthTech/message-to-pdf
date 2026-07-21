@@ -132,10 +132,10 @@ pub fn write(conv: &Conversation, out: &Path) -> Result<()> {
         eprintln!("  pdf-warn: {w:?}");
     }
 
-    if let Some(parent) = out.parent() {
-        if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent).ok();
-        }
+    if let Some(parent) = out.parent()
+        && !parent.as_os_str().is_empty()
+    {
+        std::fs::create_dir_all(parent).ok();
     }
     std::fs::write(out, &bytes).with_context(|| format!("writing {}", out.display()))?;
     Ok(())
@@ -903,5 +903,28 @@ pub fn safe_filename(label: &str) -> String {
         "conversation".to_string()
     } else {
         out
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::safe_filename;
+
+    #[test]
+    fn keeps_safe_characters() {
+        assert_eq!(safe_filename("John_Doe.1"), "John_Doe.1");
+        assert_eq!(safe_filename("+15555550123"), "+15555550123");
+        assert_eq!(safe_filename("a@b.com"), "a@b.com");
+    }
+
+    #[test]
+    fn replaces_separators_and_spaces() {
+        assert_eq!(safe_filename("a/b c:d"), "a_b_c_d");
+    }
+
+    #[test]
+    fn empty_becomes_placeholder() {
+        assert_eq!(safe_filename(""), "conversation");
+        assert_eq!(safe_filename("/"), "_");
     }
 }

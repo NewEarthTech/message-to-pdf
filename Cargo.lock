@@ -1185,13 +1185,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "msg2pdf"
+name = "msg2pdf-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "dialoguer",
+ "msg2pdf-core",
+]
+
+[[package]]
+name = "msg2pdf-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
- "clap",
- "dialoguer",
  "image",
  "imessage-database",
  "kamadak-exif",
