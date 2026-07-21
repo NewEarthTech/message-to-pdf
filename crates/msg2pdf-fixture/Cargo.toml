@@ -1,0 +1,18 @@
+[package]
+name = "msg2pdf-fixture"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Synthetic chat.db fixture for msg2pdf tests and dev — no real message content"
+publish = false
+
+[lib]
+name = "msg2pdf_fixture"
+
+[[bin]]
+name = "gen-fixture"
+path = "src/bin/gen_fixture.rs"
+
+[dependencies]
+rusqlite = { version = "=0.39.0", features = ["bundled"] }
+anyhow = { workspace = true }

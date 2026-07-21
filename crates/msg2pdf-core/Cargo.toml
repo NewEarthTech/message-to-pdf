@@ -20,3 +20,6 @@ kamadak-exif = "0.6"
 twemoji-assets = { version = "1.5", default-features = false, features = ["png"] }
 unicode-segmentation = "1"
 anyhow = { workspace = true }
+
+[dev-dependencies]
+msg2pdf-fixture = { path = "../msg2pdf-fixture" }

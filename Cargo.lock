@@ -1203,11 +1203,20 @@ dependencies = [
  "image",
  "imessage-database",
  "kamadak-exif",
+ "msg2pdf-fixture",
  "printpdf",
  "rusqlite",
  "ttf-parser",
  "twemoji-assets",
  "unicode-segmentation",
+]
+
+[[package]]
+name = "msg2pdf-fixture"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "rusqlite",
 ]
 
 [[package]]

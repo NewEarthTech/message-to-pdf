@@ -4,6 +4,13 @@
 *.pdf
 *.html
 
+# Generated fixture databases — schema.sql + seed.sql are the source of truth.
+*.db
+
+# Desktop app frontend
+node_modules/
+dist/
+
 # Local Claude Code config
 CLAUDE.md
 CLAUDE.local.md
