@@ -6,7 +6,7 @@
 
 use anyhow::Result;
 use chrono::{DateTime, Local, TimeZone};
-use rusqlite::Connection;
+use rusqlite::{Connection, OptionalExtension};
 
 use crate::contacts::Directory;
 use crate::load::ChatRef;
@@ -104,6 +104,58 @@ pub fn list(db: &Connection, contacts: &Directory) -> Result<Vec<ConversationSum
         });
     }
     Ok(out)
+}
+
+/// Look up a single 1:1 conversation by its chat ROWID, resolved against
+/// `contacts`. Returns `None` if no 1:1 chat has that ROWID.
+pub fn by_rowid(
+    db: &Connection,
+    contacts: &Directory,
+    rowid: i32,
+) -> Result<Option<ConversationSummary>> {
+    let mut stmt = db.prepare(
+        "
+        SELECT
+            c.ROWID AS chat_id,
+            h.id AS handle,
+            c.display_name AS display,
+            (SELECT MAX(m.date) FROM chat_message_join cmj
+                JOIN message m ON m.ROWID = cmj.message_id
+                WHERE cmj.chat_id = c.ROWID) AS last_date,
+            (SELECT COUNT(*) FROM chat_message_join cmj
+                WHERE cmj.chat_id = c.ROWID) AS message_count
+        FROM chat c
+        JOIN chat_handle_join chj ON chj.chat_id = c.ROWID
+        JOIN handle h ON h.ROWID = chj.handle_id
+        WHERE c.ROWID = ?1
+        GROUP BY c.ROWID
+        HAVING COUNT(chj.handle_id) = 1
+        ",
+    )?;
+
+    let row = stmt
+        .query_row([rowid], |r| {
+            Ok((
+                r.get::<_, i32>(0)?,
+                r.get::<_, String>(1)?,
+                r.get::<_, Option<String>>(2)?,
+                r.get::<_, Option<i64>>(3)?,
+                r.get::<_, i64>(4)?,
+            ))
+        })
+        .optional()?;
+
+    Ok(row.map(|(rowid, handle, display, last_date, message_count)| {
+        let contact_name = contacts.lookup(&handle).map(str::to_string);
+        ConversationSummary {
+            rowid,
+            handle,
+            display,
+            contact_name,
+            last_message: apple_ns_to_local(last_date),
+            message_count,
+        }
+    }))
 }
 
 #[cfg(test)]

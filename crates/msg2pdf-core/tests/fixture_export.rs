@@ -41,14 +41,54 @@ fn exports_fixture_conversation_to_valid_pdf() {
 
     let chat = load::resolve_contact(&db, &contacts::Directory::empty(), "+15551234567").unwrap();
     let asset_dir = assets::AssetDir::new().unwrap();
-    let conv = model::build(&db, &chat, &db_path, &asset_dir, &mut |_: Progress| {}).unwrap();
+    let conv = model::build(
+        &db,
+        &chat,
+        &db_path,
+        &asset_dir,
+        &model::DateRange::default(),
+        &mut |_: Progress| {},
+    )
+    .unwrap();
     assert!(!conv.bubbles.is_empty(), "conversation has bubbles");
 
     let out = temp_path("export.pdf");
-    pdf::write(&conv, &out).unwrap();
+    pdf::write(&conv, &out, &mut |_: Progress| {}).unwrap();
     let bytes = std::fs::read(&out).unwrap();
     assert!(bytes.starts_with(b"%PDF"), "produces a valid PDF");
 
     std::fs::remove_file(&db_path).ok();
     std::fs::remove_file(&out).ok();
+}
+
+#[test]
+fn build_respects_date_range() {
+    let db_path = temp_path("range.db");
+    msg2pdf_fixture::create(&db_path).unwrap();
+    let db = load::open(&db_path).unwrap();
+    let chat = load::resolve_contact(&db, &contacts::Directory::empty(), "+15551234567").unwrap();
+    let asset_dir = assets::AssetDir::new().unwrap();
+
+    // Chat 1's messages are all on 2024-06-10; full history keeps them.
+    let full = model::build(
+        &db,
+        &chat,
+        &db_path,
+        &asset_dir,
+        &model::DateRange::default(),
+        &mut |_: Progress| {},
+    )
+    .unwrap();
+    assert!(full.bubbles.len() >= 5, "full history keeps the messages");
+
+    // A window starting the next day filters everything out.
+    let after = model::DateRange {
+        start: Some("2024-06-11".to_string()),
+        end: None,
+    };
+    let filtered = model::build(&db, &chat, &db_path, &asset_dir, &after, &mut |_: Progress| {})
+        .unwrap();
+    assert!(filtered.bubbles.is_empty(), "no messages on or after 2024-06-11");
+
+    std::fs::remove_file(&db_path).ok();
 }

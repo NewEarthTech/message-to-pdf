@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 use chrono::{DateTime, Local};
 use imessage_database::message_types::edited::{EditStatus, EditedEvent};
 use imessage_database::message_types::variants::{Tapback, Variant};
@@ -61,16 +61,34 @@ pub struct Conversation {
     pub bubbles: Vec<Bubble>,
 }
 
+/// A date filter for an export. `None` bounds are unbounded (full history).
+/// Dates are `YYYY-MM-DD` local; the range is `[start, end)` — end exclusive,
+/// matching imessage-database's `QueryContext`.
+#[derive(Debug, Clone, Default)]
+pub struct DateRange {
+    pub start: Option<String>,
+    pub end: Option<String>,
+}
+
 pub fn build(
     db: &Connection,
     chat: &ChatRef,
     db_path: &Path,
     assets: &AssetDir,
+    range: &DateRange,
     progress: &mut dyn FnMut(Progress),
 ) -> Result<Conversation> {
     let offset = get_offset();
 
     let mut ctx = QueryContext::default();
+    if let Some(start) = range.start.as_deref() {
+        ctx.set_start(start)
+            .map_err(|e| anyhow!("invalid start date {start:?}: {e}"))?;
+    }
+    if let Some(end) = range.end.as_deref() {
+        ctx.set_end(end)
+            .map_err(|e| anyhow!("invalid end date {end:?}: {e}"))?;
+    }
     let mut chats = BTreeSet::new();
     chats.insert(chat.rowid);
     ctx.set_selected_chat_ids(chats);

@@ -9,10 +9,11 @@ use std::path::PathBuf;
 
 use serde::Serialize;
 use tauri::State;
-use tauri_typed_ipc::{handler, procedures};
+use tauri_typed_ipc::{Channel, handler, procedures};
 
 use msg2pdf_core::conversations::{self, ConversationSummary};
-use msg2pdf_core::{contacts, load};
+use msg2pdf_core::progress::Progress;
+use msg2pdf_core::{assets, contacts, load, model, pdf};
 
 /// App-managed configuration: which `chat.db` to read from.
 struct AppState {
@@ -45,10 +46,79 @@ impl From<ConversationSummary> for Conversation {
     }
 }
 
+/// A streamed progress update during an export.
+#[derive(Serialize, specta::Type)]
+struct ProgressEvent {
+    /// Coarse phase: `preparing` | `building` | `rendering` | `saving`.
+    phase: String,
+    /// Human-readable status for the current step.
+    label: String,
+    /// Completion of the current phase in 0.0–1.0, or null when indeterminate.
+    fraction: Option<f64>,
+}
+
+/// The result of a successful export.
+#[derive(Serialize, specta::Type)]
+struct ExportResult {
+    /// Absolute path of the written PDF.
+    path: String,
+}
+
+/// Collapse the engine's fine-grained [`Progress`] into a UI-friendly event.
+fn map_progress(ev: Progress) -> ProgressEvent {
+    let fraction = |done: usize, total: usize| (total > 0).then(|| done as f64 / total as f64);
+    let (phase, label, fraction) = match ev {
+        Progress::Streaming { count } => ("preparing", format!("Reading messages… {count}"), None),
+        Progress::Streamed { total } => ("preparing", format!("Read {total} messages"), None),
+        Progress::Note(message) => ("preparing", message, None),
+        Progress::Building { done, total, .. } => (
+            "building",
+            format!("Building conversation… {done}/{total}"),
+            fraction(done, total),
+        ),
+        Progress::Built { bubbles, .. } => {
+            ("building", format!("Built {bubbles} messages"), Some(1.0))
+        }
+        Progress::PreloadedEmoji { glyphs } => {
+            ("rendering", format!("Prepared {glyphs} emoji"), None)
+        }
+        Progress::LayingOut { done, total, .. } => (
+            "rendering",
+            format!("Laying out pages… {done}/{total}"),
+            fraction(done, total),
+        ),
+        Progress::LaidOut { pages, .. } => {
+            ("rendering", format!("Laid out {pages} pages"), Some(1.0))
+        }
+        Progress::Serializing => ("saving", "Saving PDF…".to_string(), None),
+        Progress::Serialized { bytes } => {
+            ("saving", format!("Wrote {} KB", bytes / 1024), Some(1.0))
+        }
+    };
+    ProgressEvent {
+        phase: phase.to_string(),
+        label,
+        fraction,
+    }
+}
+
 #[procedures]
 trait Ipc {
     /// List every 1:1 conversation in the configured `chat.db`, newest first.
     fn list_conversations(&self, state: State<AppState>) -> Result<Vec<Conversation>, String>;
+
+    /// Export the conversation with `rowid` to a PDF in `out_dir`, streaming
+    /// [`ProgressEvent`]s. `start`/`end` are `YYYY-MM-DD` bounds — start
+    /// inclusive, end exclusive; null means unbounded (full history).
+    fn export_conversation(
+        &self,
+        rowid: i32,
+        out_dir: String,
+        start: Option<String>,
+        end: Option<String>,
+        on_progress: Channel<ProgressEvent>,
+        state: State<AppState>,
+    ) -> Result<ExportResult, String>;
 }
 
 struct Backend;
@@ -59,6 +129,40 @@ impl Ipc for Backend {
         let directory = contacts::Directory::load();
         let summaries = conversations::list(&db, &directory).map_err(|e| e.to_string())?;
         Ok(summaries.into_iter().map(Conversation::from).collect())
+    }
+
+    fn export_conversation(
+        &self,
+        rowid: i32,
+        out_dir: String,
+        start: Option<String>,
+        end: Option<String>,
+        on_progress: Channel<ProgressEvent>,
+        state: State<AppState>,
+    ) -> Result<ExportResult, String> {
+        let db = load::open(&state.db_path).map_err(|e| e.to_string())?;
+        let directory = contacts::Directory::load();
+        let chat = conversations::by_rowid(&db, &directory, rowid)
+            .map_err(|e| e.to_string())?
+            .ok_or_else(|| format!("no 1:1 conversation with id {rowid}"))?
+            .into_chat_ref();
+
+        let asset_dir = assets::AssetDir::new().map_err(|e| e.to_string())?;
+        let range = model::DateRange { start, end };
+        let mut sink = |ev: Progress| {
+            let _ = on_progress.send(map_progress(ev));
+        };
+
+        let conv = model::build(&db, &chat, &state.db_path, &asset_dir, &range, &mut sink)
+            .map_err(|e| e.to_string())?;
+
+        let stem = pdf::safe_filename(chat.label());
+        let out_path = PathBuf::from(&out_dir).join(format!("{stem}.pdf"));
+        pdf::write(&conv, &out_path, &mut sink).map_err(|e| e.to_string())?;
+
+        Ok(ExportResult {
+            path: out_path.to_string_lossy().into_owned(),
+        })
     }
 }
 
@@ -90,6 +194,8 @@ fn default_db_path() -> PathBuf {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .manage(AppState {
             db_path: resolve_db_path(),
         })

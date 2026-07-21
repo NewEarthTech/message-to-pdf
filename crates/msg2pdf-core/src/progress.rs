@@ -27,4 +27,18 @@ pub enum Progress {
         attachments: usize,
         images: usize,
     },
+    /// Unique emoji glyphs preloaded before layout.
+    PreloadedEmoji { glyphs: usize },
+    /// Laying bubbles onto pages: `done` of `total`, across `pages` so far.
+    LayingOut {
+        done: usize,
+        total: usize,
+        pages: usize,
+    },
+    /// Layout finished: `bubbles` placed across `pages`.
+    LaidOut { bubbles: usize, pages: usize },
+    /// Serializing the laid-out document to PDF bytes.
+    Serializing,
+    /// The PDF serialized to `bytes` bytes.
+    Serialized { bytes: usize },
 }

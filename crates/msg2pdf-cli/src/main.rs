@@ -54,13 +54,21 @@ fn main() -> Result<()> {
     eprintln!("  asset dir: {}", asset_dir.root().display());
 
     eprintln!("loading {}…", chat.label());
-    let conv = model::build(&db, &chat, &db_path, &asset_dir, &mut render_progress)
-        .context("building conversation")?;
+    let conv = model::build(
+        &db,
+        &chat,
+        &db_path,
+        &asset_dir,
+        &model::DateRange::default(),
+        &mut render_progress,
+    )
+    .context("building conversation")?;
 
     let stem = pdf::safe_filename(chat.label());
     let out = cli.out.join(format!("{stem}.pdf"));
     eprintln!("writing pdf → {}", out.display());
-    pdf::write(&conv, &out).with_context(|| format!("writing {}", out.display()))?;
+    pdf::write(&conv, &out, &mut render_progress)
+        .with_context(|| format!("writing {}", out.display()))?;
 
     let size = std::fs::metadata(&out).map(|m| m.len()).unwrap_or(0);
     println!("wrote {} ({} bytes)", out.display(), size);
@@ -97,6 +105,23 @@ fn render_progress(ev: Progress) {
             eprintln!(
                 "\r  built {bubbles} bubbles · {attachments} attachments · {images} images prepared            "
             );
+        }
+        Progress::PreloadedEmoji { glyphs } => {
+            eprintln!("  preloaded {glyphs} unique emoji glyphs");
+        }
+        Progress::LayingOut { done, total, pages } => {
+            eprint!("\r  laying out… {done}/{total} bubbles · {pages} pages");
+            let _ = std::io::stderr().flush();
+        }
+        Progress::LaidOut { bubbles, pages } => {
+            eprintln!("\r  laid out {bubbles} bubbles across {pages} pages              ");
+        }
+        Progress::Serializing => {
+            eprint!("  serializing pdf…");
+            let _ = std::io::stderr().flush();
+        }
+        Progress::Serialized { bytes } => {
+            eprintln!(" {bytes} bytes");
         }
     }
 }
