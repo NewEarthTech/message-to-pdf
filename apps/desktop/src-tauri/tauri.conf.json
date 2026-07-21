@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "msg2pdf",
+  "productName": "Sheaf",
   "version": "0.1.0",
-  "identifier": "com.msg2pdf.desktop",
+  "identifier": "com.sheaf.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:47611",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "msg2pdf",
+        "title": "Sheaf",
         "width": 1000,
         "height": 720,
         "minWidth": 720,

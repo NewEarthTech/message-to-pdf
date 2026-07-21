@@ -1,4 +1,5 @@
 import { openUrl } from "@tauri-apps/plugin-opener"
+import { PRODUCT_NAME } from "./product"
 
 // Deep-links straight to System Settings › Privacy & Security › Full Disk Access.
 const FDA_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
@@ -16,21 +17,21 @@ export function FullDiskAccess({ access, onRecheck }: Props) {
           <>
             <h2 className="font-semibold text-lg">No Messages database found</h2>
             <p className="mt-2 text-neutral-600 text-sm">
-              msg2pdf couldn't find a <code className="rounded bg-neutral-100 px-1">chat.db</code>{" "}
-              at the expected location. If your messages live elsewhere, you can point the app at a
-              copy.
+              {PRODUCT_NAME} couldn't find a{" "}
+              <code className="rounded bg-neutral-100 px-1">chat.db</code> at the expected location.
+              If your messages live elsewhere, you can point the app at a copy.
             </p>
           </>
         ) : (
           <>
             <h2 className="font-semibold text-lg">Full Disk Access needed</h2>
             <p className="mt-2 text-neutral-600 text-sm">
-              macOS keeps your Messages database private. To read your conversations, msg2pdf needs
-              Full Disk Access. Everything stays on your Mac — nothing is uploaded.
+              macOS keeps your Messages database private. To read your conversations, {PRODUCT_NAME}{" "}
+              needs Full Disk Access. Everything stays on your Mac — nothing is uploaded.
             </p>
             <ol className="mt-4 list-decimal space-y-1 pl-5 text-neutral-600 text-sm">
               <li>Open System Settings → Privacy &amp; Security → Full Disk Access.</li>
-              <li>Turn on the switch for msg2pdf.</li>
+              <li>Turn on the switch for {PRODUCT_NAME}.</li>
               <li>Come back — this screen updates on its own.</li>
             </ol>
           </>
