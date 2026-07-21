@@ -1,9 +1,11 @@
 import { getCurrentWindow } from "@tauri-apps/api/window"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { AboutDialog } from "./AboutDialog"
 import { type AccessStatus, type Conversation, ipc } from "./bindings"
 import { ConversationList } from "./ConversationList"
 import { ExportPanel } from "./ExportPanel"
 import { FullDiskAccess } from "./FullDiskAccess"
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from "./product"
 
 type Phase =
   | { kind: "checking" }
@@ -15,6 +17,7 @@ type Phase =
 function App() {
   const [phase, setPhase] = useState<Phase>({ kind: "checking" })
   const [selected, setSelected] = useState<Conversation | null>(null)
+  const [aboutOpen, setAboutOpen] = useState(false)
   const phaseRef = useRef(phase)
   phaseRef.current = phase
 
@@ -51,9 +54,18 @@ function App() {
   return (
     <div className="flex h-screen flex-col bg-neutral-50 text-neutral-900">
       <header className="flex items-baseline gap-3 border-neutral-200 border-b px-6 py-3">
-        <h1 className="font-semibold text-lg">msg2pdf</h1>
-        <p className="text-neutral-500 text-sm">Export an iMessage conversation to PDF</p>
+        <h1 className="font-semibold text-lg">{PRODUCT_NAME}</h1>
+        <p className="text-neutral-500 text-sm">{PRODUCT_TAGLINE}</p>
+        <button
+          type="button"
+          onClick={() => setAboutOpen(true)}
+          className="ml-auto self-center rounded-md px-2.5 py-1 text-neutral-500 text-sm hover:bg-neutral-100 hover:text-neutral-700"
+        >
+          About
+        </button>
       </header>
+
+      {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} />}
 
       {phase.kind === "checking" && (
         <p className="p-6 text-neutral-500 text-sm">Checking access…</p>
