@@ -16,7 +16,13 @@
     },
     {
       "identifier": "opener:allow-open-url",
-      "allow": [{ "url": "x-apple.systempreferences:*" }]
+      "allow": [
+        { "url": "x-apple.systempreferences:*" },
+        { "url": "https://github.com/johncarmack1984/message-to-pdf" },
+        { "url": "https://www.gnu.org/licenses/gpl-3.0.html" },
+        { "url": "https://crates.io/crates/imessage-database" },
+        { "url": "https://crates.io/crates/crabstep" }
+      ]
     }
   ]
 }
