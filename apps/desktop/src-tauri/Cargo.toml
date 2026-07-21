@@ -5,6 +5,8 @@ edition.workspace = true
 license.workspace = true
 description = "msg2pdf desktop app"
 publish = false
+# `tauri dev`/`build` invoke `cargo run` with no --bin; disambiguate from the gen_bindings bin.
+default-run = "msg2pdf-desktop"
 
 [lib]
 name = "msg2pdf_desktop_lib"
