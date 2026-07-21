@@ -46,8 +46,10 @@ pub fn open(path: &Path) -> Result<Connection> {
 pub enum Access {
     /// Opened read-only successfully.
     Readable,
-    /// The file exists but could not be opened. On macOS this is the Full Disk
-    /// Access case: `chat.db` is protected until the app is granted access.
+    /// Present but not readable — the Full Disk Access case on macOS. Until the
+    /// app is granted access, `~/Library/Messages/` is TCC-protected and even
+    /// `stat`ing `chat.db` fails, so this covers any error other than "not
+    /// found" (permission denied to stat or to open).
     Denied,
     /// No file exists at that path.
     Missing,
@@ -56,14 +58,24 @@ pub enum Access {
 /// Probe whether `path` can be opened read-only, distinguishing "protected"
 /// (needs Full Disk Access) from "not there".
 pub fn check_access(path: &Path) -> Access {
-    if !path.exists() {
-        return Access::Missing;
-    }
-    match Connection::open_with_flags(
-        path,
-        OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
-    ) {
-        Ok(_) => Access::Readable,
+    // Probe the file directly rather than through `path.exists()`. Under macOS
+    // TCC, `~/Library/Messages/` is a protected directory, so before Full Disk
+    // Access is granted a `stat()` on the `chat.db` inside it fails with EPERM.
+    // `Path::exists()` collapses that into `false` — indistinguishable from a
+    // file that genuinely isn't there — which would route a denied user to the
+    // "no database" message instead of the Full Disk Access onboarding. The
+    // error kind from an open attempt keeps them apart: NotFound is Missing;
+    // any other error (EPERM/EACCES, whether from the stat or the open) is
+    // Denied. On success we still confirm SQLite can open it read-only.
+    match std::fs::File::open(path) {
+        Ok(_) => match Connection::open_with_flags(
+            path,
+            OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
+        ) {
+            Ok(_) => Access::Readable,
+            Err(_) => Access::Denied,
+        },
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Access::Missing,
         Err(_) => Access::Denied,
     }
 }

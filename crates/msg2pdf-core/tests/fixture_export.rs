@@ -109,3 +109,28 @@ fn check_access_reports_readable_and_missing() {
     std::fs::remove_file(&db_path).ok();
     assert_eq!(load::check_access(&db_path), load::Access::Missing);
 }
+
+#[cfg(unix)]
+#[test]
+fn check_access_reports_denied_when_stat_is_blocked() {
+    use std::os::unix::fs::PermissionsExt;
+
+    // Reproduces the macOS TCC shape without touching real data: a parent
+    // directory with no permissions makes stat() on the db inside fail with a
+    // permission error (not "not found"), exactly as `~/Library/Messages/` does
+    // before Full Disk Access is granted. That must classify as Denied (→ FDA
+    // onboarding), never Missing. (Meaningful as non-root; root bypasses perms.)
+    let dir = temp_path("denied-parent");
+    std::fs::create_dir_all(&dir).unwrap();
+    let db_path = dir.join("chat.db");
+    std::fs::write(&db_path, b"SQLite format 3\0").unwrap();
+    std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o000)).unwrap();
+
+    let access = load::check_access(&db_path);
+
+    // Restore access so cleanup runs regardless of the assertion outcome.
+    std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o755)).ok();
+    std::fs::remove_dir_all(&dir).ok();
+
+    assert_eq!(access, load::Access::Denied);
+}
