@@ -122,14 +122,19 @@ trait Ipc {
     /// Export the conversation with `rowid` to a PDF in `out_dir`, streaming
     /// [`ProgressEvent`]s. `start`/`end` are `YYYY-MM-DD` bounds — start
     /// inclusive, end exclusive; null means unbounded (full history).
-    fn export_conversation(
+    ///
+    /// Async so ttipc spawns it on the runtime instead of dispatching it
+    /// inline on the webview thread; the heavy body then runs under
+    /// [`spawn_blocking`](tauri::async_runtime::spawn_blocking) so a large
+    /// export never freezes the UI and streamed progress paints live.
+    async fn export_conversation(
         &self,
         rowid: i32,
         out_dir: String,
         start: Option<String>,
         end: Option<String>,
         on_progress: Channel<ProgressEvent>,
-        state: State<AppState>,
+        state: State<'_, AppState>,
     ) -> Result<ExportResult, String>;
 }
 
@@ -151,38 +156,50 @@ impl Ipc for Backend {
         Ok(summaries.into_iter().map(Conversation::from).collect())
     }
 
-    fn export_conversation(
+    async fn export_conversation(
         &self,
         rowid: i32,
         out_dir: String,
         start: Option<String>,
         end: Option<String>,
         on_progress: Channel<ProgressEvent>,
-        state: State<AppState>,
+        state: State<'_, AppState>,
     ) -> Result<ExportResult, String> {
-        let db = load::open(&state.db_path).map_err(|e| e.to_string())?;
-        let directory = contacts::Directory::load();
-        let chat = conversations::by_rowid(&db, &directory, rowid)
-            .map_err(|e| e.to_string())?
-            .ok_or_else(|| format!("no 1:1 conversation with id {rowid}"))?
-            .into_chat_ref();
+        // `rusqlite::Connection` is not `Send`, so the entire export — open
+        // through write — runs inside one `spawn_blocking` closure: the
+        // connection is created, used, and dropped there, never crossing a
+        // thread boundary. Only owned, `Send` values move in: the copied db
+        // path and the `Channel` (which owns its inner tauri channel). Running
+        // off the async runtime keeps the webview thread free, so the streamed
+        // progress paints live throughout a large export.
+        let db_path = state.db_path.clone();
+        tauri::async_runtime::spawn_blocking(move || -> Result<ExportResult, String> {
+            let db = load::open(&db_path).map_err(|e| e.to_string())?;
+            let directory = contacts::Directory::load();
+            let chat = conversations::by_rowid(&db, &directory, rowid)
+                .map_err(|e| e.to_string())?
+                .ok_or_else(|| format!("no 1:1 conversation with id {rowid}"))?
+                .into_chat_ref();
 
-        let asset_dir = assets::AssetDir::new().map_err(|e| e.to_string())?;
-        let range = model::DateRange { start, end };
-        let mut sink = |ev: Progress| {
-            let _ = on_progress.send(map_progress(ev));
-        };
+            let asset_dir = assets::AssetDir::new().map_err(|e| e.to_string())?;
+            let range = model::DateRange { start, end };
+            let mut sink = |ev: Progress| {
+                let _ = on_progress.send(map_progress(ev));
+            };
 
-        let conv = model::build(&db, &chat, &state.db_path, &asset_dir, &range, &mut sink)
-            .map_err(|e| e.to_string())?;
+            let conv = model::build(&db, &chat, &db_path, &asset_dir, &range, &mut sink)
+                .map_err(|e| e.to_string())?;
 
-        let stem = pdf::safe_filename(chat.label());
-        let out_path = PathBuf::from(&out_dir).join(format!("{stem}.pdf"));
-        pdf::write(&conv, &out_path, &mut sink).map_err(|e| e.to_string())?;
+            let stem = pdf::safe_filename(chat.label());
+            let out_path = PathBuf::from(&out_dir).join(format!("{stem}.pdf"));
+            pdf::write(&conv, &out_path, &mut sink).map_err(|e| e.to_string())?;
 
-        Ok(ExportResult {
-            path: out_path.to_string_lossy().into_owned(),
+            Ok(ExportResult {
+                path: out_path.to_string_lossy().into_owned(),
+            })
         })
+        .await
+        .map_err(|e| e.to_string())?
     }
 }
 
