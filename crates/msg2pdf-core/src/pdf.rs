@@ -13,6 +13,7 @@ use crate::emoji::{
 };
 use crate::font::{BOLD_TTF, Metrics, REGULAR_TTF};
 use crate::model::{AttachmentOut, Bubble, Conversation, EditedVersion, Reaction, ReplySnippet};
+use crate::progress::Progress;
 use std::collections::HashSet;
 
 const PAGE_W: f32 = 612.0;
@@ -51,9 +52,7 @@ const THEM_FG: Rgb = Rgb { r: 0.110, g: 0.110, b: 0.118, icc_profile: None };
 const MUTED: Rgb = Rgb { r: 0.557, g: 0.557, b: 0.576, icc_profile: None };
 const HAIRLINE: Rgb = Rgb { r: 0.898, g: 0.898, b: 0.918, icc_profile: None };
 
-pub fn write(conv: &Conversation, out: &Path) -> Result<()> {
-    use std::io::Write;
-
+pub fn write(conv: &Conversation, out: &Path, progress: &mut dyn FnMut(Progress)) -> Result<()> {
     let metrics_regular = Metrics::new(REGULAR_TTF);
     let metrics_bold = Metrics::new(BOLD_TTF);
 
@@ -69,7 +68,7 @@ pub fn write(conv: &Conversation, out: &Path) -> Result<()> {
 
     let mut atlas = EmojiAtlas::new();
     preload_emojis(conv, &mut doc, &mut atlas);
-    eprintln!("  preloaded {} unique emoji glyphs", atlas.len());
+    progress(Progress::PreloadedEmoji { glyphs: atlas.len() });
 
     let mut layout = Layout {
         pages: vec![PageOps::default()],
@@ -101,19 +100,18 @@ pub fn write(conv: &Conversation, out: &Path) -> Result<()> {
         prev_time = Some(b.sent_at);
 
         if last_log.elapsed() >= std::time::Duration::from_millis(500) {
-            eprint!(
-                "\r  laying out… {idx}/{total} bubbles · {} pages",
-                layout.pages.len()
-            );
-            let _ = std::io::stderr().flush();
+            progress(Progress::LayingOut {
+                done: idx,
+                total,
+                pages: layout.pages.len(),
+            });
             last_log = std::time::Instant::now();
         }
     }
-    eprintln!(
-        "\r  laid out {} bubbles across {} pages              ",
-        total,
-        layout.pages.len()
-    );
+    progress(Progress::LaidOut {
+        bubbles: total,
+        pages: layout.pages.len(),
+    });
 
     let pages: Vec<PdfPage> = layout
         .pages
@@ -121,15 +119,14 @@ pub fn write(conv: &Conversation, out: &Path) -> Result<()> {
         .map(|p| PdfPage::new(Mm(215.9), Mm(279.4), p.ops))
         .collect();
 
-    eprint!("  serializing pdf…");
-    let _ = std::io::stderr().flush();
+    progress(Progress::Serializing);
     let mut warnings = Vec::new();
     let bytes = doc
         .with_pages(pages)
         .save(&PdfSaveOptions::default(), &mut warnings);
-    eprintln!(" {} bytes", bytes.len());
+    progress(Progress::Serialized { bytes: bytes.len() });
     for w in warnings.iter().take(5) {
-        eprintln!("  pdf-warn: {w:?}");
+        progress(Progress::Note(format!("pdf-warn: {w:?}")));
     }
 
     if let Some(parent) = out.parent()
