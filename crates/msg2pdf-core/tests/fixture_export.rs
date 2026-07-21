@@ -52,6 +52,13 @@ fn exports_fixture_conversation_to_valid_pdf() {
     .unwrap();
     assert!(!conv.bubbles.is_empty(), "conversation has bubbles");
 
+    let has_rendered_image = conv
+        .bubbles
+        .iter()
+        .flat_map(|b| &b.attachments)
+        .any(|a| a.image_path.is_some() && !a.missing);
+    assert!(has_rendered_image, "the fixture's attachment renders as an inline image");
+
     let out = temp_path("export.pdf");
     pdf::write(&conv, &out, &mut |_: Progress| {}).unwrap();
     let bytes = std::fs::read(&out).unwrap();

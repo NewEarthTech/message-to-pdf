@@ -8,6 +8,8 @@
 
 # Generated fixture databases — schema.sql + seed.sql are the source of truth.
 *.db
+# Runtime-written fixture attachment copies (source image: crates/msg2pdf-fixture/lunch.jpeg).
+*-attachments/
 
 # Desktop app frontend
 node_modules/

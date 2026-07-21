@@ -60,8 +60,9 @@ INSERT INTO message (ROWID, guid, text, handle_id, is_from_me, is_sent, is_deliv
   (11, 'FIX-3-0002', 'Yes! How can I help?', 3, 0, 0, 0, 0, 0, 'SMS', 0, 0,
      (CAST(strftime('%s','2024-03-01 09:15:00') AS INTEGER) - 978307200) * 1000000000, 0, 0);
 
--- One image attachment on chat 1's message 5. The file is not present on disk, so the
--- engine renders it as a "missing" attachment — a real, common case (iCloud eviction).
+-- One image attachment on chat 1's message 5. create() writes a synthetic JPEG next to the
+-- database and rewrites this row's filename + total_bytes to point at it, so the export
+-- renders a real inline photo. The placeholder path/size below are overwritten at build time.
 INSERT INTO attachment (ROWID, guid, filename, uti, mime_type, transfer_name, total_bytes, is_outgoing, original_guid) VALUES
   (1, 'FIX-ATT-0001', '~/Library/Messages/Attachments/fx/00/FIX-ATT-0001/lunch.jpeg',
      'public.jpeg', 'image/jpeg', 'lunch.jpeg', 842130, 1, 'FIX-ATT-0001-ORIG');
