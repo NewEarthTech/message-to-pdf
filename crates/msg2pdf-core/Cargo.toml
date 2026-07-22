@@ -13,7 +13,7 @@ name = "msg2pdf_core"
 imessage-database = "=4.0.0"
 rusqlite = { version = "=0.39.0", features = ["blob", "bundled"] }
 chrono = { workspace = true }
-printpdf = { version = "0.9", features = ["images", "jpeg", "png", "gif", "webp"] }
+printpdf = { version = "0.11", features = ["images", "jpeg", "png", "gif", "webp"] }
 ttf-parser = "0.25"
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp"] }
 kamadak-exif = "0.6"
