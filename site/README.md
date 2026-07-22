@@ -17,7 +17,8 @@ site/
 ## Before anything ships — needs John
 
 - **All prose is a draft for your review.** Honest, non-hypey, privacy-forward. The two hero lines (`index.html` `<h1>` + `.sub`) are the spots that most want a **/john-voice** pass — everything else is functional/legal copy that should stay plain.
-- **Placeholders to fill:** the support email in `terms.html` and `faq.html` (`[support email — to add]`), and the source-repo URL if the GitHub repo gets renamed from `message-to-pdf`.
+- **Support email:** `sales@newearth.llc` (live) — wired into `terms.html` (contact + refund) and `faq.html` (refund).
+- **Placeholder to fill:** the source-repo URL, if the GitHub repo gets renamed from `message-to-pdf`.
 
 ## Paddle checkout (sandbox → live)
 
