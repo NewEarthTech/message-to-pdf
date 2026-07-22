@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Newer pushes to the same branch/PR cancel older, still-running jobs.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & test (macOS)
+    # macOS only by construction: the tests shell out to `sips`, read the
+    # AddressBook, and build the Tauri app against macOS system frameworks.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable + clippy)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        working-directory: apps/desktop
+        run: pnpm install --frozen-lockfile
+
+      - name: Biome (lint + format)
+        working-directory: apps/desktop
+        run: pnpm exec biome check
+
+      # Builds apps/desktop/dist, which the desktop crate embeds via
+      # `generate_context!`, so it must exist before the cargo steps.
+      - name: Build frontend
+        working-directory: apps/desktop
+        run: pnpm build
+
+      - name: Clippy (workspace, default features)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Clippy (desktop app, export feature)
+        run: cargo clippy -p msg2pdf-desktop --all-targets --features export -- -D warnings
+
+      - name: Test (workspace)
+        run: cargo test --workspace
+
+      - name: Test (desktop app, export feature — bindings drift)
+        run: cargo test -p msg2pdf-desktop --features export
