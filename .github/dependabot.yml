@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # Keep the CI actions current — batched into one PR.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # Rust workspace deps. Minor/patch batched; majors get their own PR.
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      cargo:
+        update-types: ["minor", "patch"]
+
+  # Desktop app frontend (pnpm). Same batching.
+  - package-ecosystem: npm
+    directory: /apps/desktop
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      frontend:
+        update-types: ["minor", "patch"]
