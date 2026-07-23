@@ -14,73 +14,72 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    name: Build & test (macOS)
-    # macOS only by construction: the tests shell out to `sips`, read the
-    # AddressBook, and build the Tauri app against macOS system frameworks.
+  # Frontend lint/format only — no Rust, no macOS frameworks, so it runs on cheap
+  # Ubuntu on its own runner and answers in seconds instead of riding inside a
+  # job that compiles.
+  biome:
+    name: Biome (lint + format)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 9
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: lts/*
+          cache: pnpm
+          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+      - name: Install frontend dependencies
+        working-directory: apps/desktop
+        run: pnpm install --frozen-lockfile
+      - name: Biome (lint + format)
+        working-directory: apps/desktop
+        run: pnpm exec biome check
+
+  # macOS by construction: clippy compiles the whole workspace, including the
+  # desktop crate that links macOS system frameworks. Runs in parallel with the
+  # test job; sccache lets whichever job reaches a crate second read the object
+  # instead of rebuilding it, so the two together cost about one compile.
+  clippy:
+    name: Clippy
     runs-on: macos-latest
+    timeout-minutes: 30
     env:
       RUSTC_WRAPPER: sccache
       SCCACHE_GHA_ENABLED: "true"
       CARGO_INCREMENTAL: "0"
     steps:
-      - uses: actions/checkout@v7
-
-      - name: Install Rust (stable + clippy)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-
-      # sccache owns per-crate compilation caching (content-addressed, so a
-      # Cargo.lock bump that invalidates rust-cache's whole target/ still hits
-      # for every unchanged crate), backed by the GitHub Actions cache.
-      - uses: mozilla-actions/sccache-action@v0.0.10
-
-      # rust-cache just keeps the cargo registry/index warm now; cache-targets:
-      # false skips the big target/ dir since sccache handles compilation.
-      - name: Cache cargo registry
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-targets: "false"
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: 9
-
-      - name: Install Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: apps/desktop/pnpm-lock.yaml
-
-      - name: Install frontend dependencies
-        working-directory: apps/desktop
-        run: pnpm install --frozen-lockfile
-
-      - name: Biome (lint + format)
-        working-directory: apps/desktop
-        run: pnpm exec biome check
-
-      # Builds apps/desktop/dist, which the desktop crate embeds via
-      # `generate_context!`, so it must exist before the cargo steps.
-      - name: Build frontend
-        working-directory: apps/desktop
-        run: pnpm build
-
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-rust
       - name: Clippy (workspace, default features)
         run: cargo clippy --workspace --all-targets -- -D warnings
-
       - name: Clippy (desktop app, export feature)
         run: cargo clippy -p msg2pdf-desktop --all-targets --features export -- -D warnings
+      - name: sccache stats
+        if: ${{ always() }}
+        run: sccache --show-stats
 
+  # macOS by construction: the tests shell out to `sips`, read the AddressBook,
+  # and build the Tauri app against macOS frameworks. Independent of clippy — its
+  # result is not an input to the lint gate — so it runs as its own parallel job
+  # and reports the moment it knows.
+  test:
+    name: Test
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: "true"
+      CARGO_INCREMENTAL: "0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-rust
       - name: Test (workspace)
         run: cargo test --workspace
-
       - name: Test (desktop app, export feature — bindings drift)
         run: cargo test -p msg2pdf-desktop --features export
-
       - name: sccache stats
         if: ${{ always() }}
         run: sccache --show-stats

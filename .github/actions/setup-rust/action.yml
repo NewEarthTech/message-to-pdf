@@ -1,0 +1,45 @@
+name: Set up Rust + frontend
+description: >
+  Rust toolchain, sccache-backed compilation cache, cargo registry cache, and the
+  built frontend that the desktop crate embeds via generate_context! — the setup
+  every job that compiles the workspace needs, defined once so the parallel jobs
+  (clippy, test) can't drift apart. Requires the repo to be checked out already.
+runs:
+  using: composite
+  steps:
+    - name: Install Rust (stable + clippy)
+      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      with:
+        components: clippy
+
+    # Content-addressed per-crate compilation cache (GitHub Actions backend). A
+    # Cargo.lock bump that invalidates rust-cache's whole target/ still hits for
+    # every unchanged crate, and two jobs compiling at once share objects instead
+    # of each building them.
+    - uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+
+    # sccache owns compilation caching, so rust-cache just keeps the cargo
+    # registry/index warm — cache-targets: false skips the big target/ dir.
+    - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+      with:
+        cache-targets: "false"
+
+    - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      with:
+        version: 9
+
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: lts/*
+        cache: pnpm
+        cache-dependency-path: apps/desktop/pnpm-lock.yaml
+
+    # tauri::generate_context! embeds ../dist at compile time, so the frontend must
+    # be built before anything compiles the desktop crate (incl. its tests). ~7s,
+    # cheaper than waiting out a separate job and round-tripping an artifact.
+    - name: Build frontend (for generate_context!)
+      shell: bash
+      working-directory: apps/desktop
+      run: |
+        pnpm install --frozen-lockfile
+        pnpm build
