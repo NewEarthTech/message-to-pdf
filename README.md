@@ -74,7 +74,6 @@ crates/
   msg2pdf-cli/      the `msg2pdf` command-line tool
   msg2pdf-fixture/  a synthetic chat.db for tests and dev (no real data, ever)
 apps/desktop/       the Sheaf app — Tauri (Rust) + React/Vite/Tailwind
-site/               the marketing site (static)
 ```
 
 Internal crate and binary names stay `msg2pdf`; the product is Sheaf.
