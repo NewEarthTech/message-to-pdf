@@ -70,6 +70,10 @@ jobs:
     # signed + notarized with an Apple Developer ID.
     runs-on: macos-latest
     timeout-minutes: 60
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: "true"
+      CARGO_INCREMENTAL: "0"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -82,8 +86,15 @@ jobs:
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
 
-      - name: Cache cargo build
+      # sccache owns per-crate compilation caching (a plain cargo build driven by
+      # the tauri CLI, so the RUSTC_WRAPPER applies), backed by the GitHub Actions cache.
+      - uses: mozilla-actions/sccache-action@v0.0.10
+
+      # rust-cache just keeps the cargo registry/index warm; sccache handles target/.
+      - name: Cache cargo registry
         uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: "false"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -165,3 +176,7 @@ jobs:
           printf '%s\n\n---\n\n**[Get Sheaf →](%s)** — signed, notarized, universal; one-time purchase.\n' \
             "$BODY" "$SALES_URL" > "$RUNNER_TEMP/notes.md"
           gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: sccache stats
+        if: ${{ always() }}
+        run: sccache --show-stats
