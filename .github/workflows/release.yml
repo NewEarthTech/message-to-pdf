@@ -144,13 +144,19 @@ jobs:
           # No tagName/releaseId → build + sign + notarize only; nothing is attached to the release.
           args: --target universal-apple-darwin
 
-      - name: Locate + verify the notarized DMG
+      - name: Notarize, staple & verify the DMG
         id: dmg
         run: |
           set -euo pipefail
           DMG=$(printf '%s' '${{ steps.tauri.outputs.artifactPaths }}' | jq -r '.[] | select(endswith(".dmg"))' | head -1)
           test -n "$DMG" && test -f "$DMG"
+          # tauri-action notarizes + staples the .app inside; the .dmg wrapper still needs its
+          # own ticket so the downloaded file itself is notarized (offline-verifiable, no
+          # Gatekeeper friction). Submit the dmg with the same App Store Connect API key.
+          xcrun notarytool submit "$DMG" --key "$APPLE_API_KEY_PATH" --key-id "$APPLE_API_KEY" --issuer "$APPLE_API_ISSUER" --wait
+          xcrun stapler staple "$DMG"
           spctl -a -vvv -t install "$DMG"
+          lipo -info "target/universal-apple-darwin/release/bundle/macos/Sheaf.app/Contents/MacOS/msg2pdf-desktop"
           echo "path=$DMG" >> "$GITHUB_OUTPUT"
 
       - name: Upload DMG to the download host + invalidate CloudFront
