@@ -19,6 +19,10 @@ jobs:
     # macOS only by construction: the tests shell out to `sips`, read the
     # AddressBook, and build the Tauri app against macOS system frameworks.
     runs-on: macos-latest
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: "true"
+      CARGO_INCREMENTAL: "0"
     steps:
       - uses: actions/checkout@v7
 
@@ -27,8 +31,17 @@ jobs:
         with:
           components: clippy
 
-      - name: Cache cargo build
+      # sccache owns per-crate compilation caching (content-addressed, so a
+      # Cargo.lock bump that invalidates rust-cache's whole target/ still hits
+      # for every unchanged crate), backed by the GitHub Actions cache.
+      - uses: mozilla-actions/sccache-action@v0.0.10
+
+      # rust-cache just keeps the cargo registry/index warm now; cache-targets:
+      # false skips the big target/ dir since sccache handles compilation.
+      - name: Cache cargo registry
         uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: "false"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -67,3 +80,7 @@ jobs:
 
       - name: Test (desktop app, export feature — bindings drift)
         run: cargo test -p msg2pdf-desktop --features export
+
+      - name: sccache stats
+        if: ${{ always() }}
+        run: sccache --show-stats

@@ -70,6 +70,10 @@ jobs:
     # signed + notarized with an Apple Developer ID.
     runs-on: macos-latest
     timeout-minutes: 60
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: "true"
+      CARGO_INCREMENTAL: "0"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -82,8 +86,15 @@ jobs:
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
 
-      - name: Cache cargo build
+      # sccache owns per-crate compilation caching (a plain cargo build driven by
+      # the tauri CLI, so the RUSTC_WRAPPER applies), backed by the GitHub Actions cache.
+      - uses: mozilla-actions/sccache-action@v0.0.10
+
+      # rust-cache just keeps the cargo registry/index warm; sccache handles target/.
+      - name: Cache cargo registry
         uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: "false"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -133,13 +144,19 @@ jobs:
           # No tagName/releaseId → build + sign + notarize only; nothing is attached to the release.
           args: --target universal-apple-darwin
 
-      - name: Locate + verify the notarized DMG
+      - name: Notarize, staple & verify the DMG
         id: dmg
         run: |
           set -euo pipefail
           DMG=$(printf '%s' '${{ steps.tauri.outputs.artifactPaths }}' | jq -r '.[] | select(endswith(".dmg"))' | head -1)
           test -n "$DMG" && test -f "$DMG"
+          # tauri-action notarizes + staples the .app inside; the .dmg wrapper still needs its
+          # own ticket so the downloaded file itself is notarized (offline-verifiable, no
+          # Gatekeeper friction). Submit the dmg with the same App Store Connect API key.
+          xcrun notarytool submit "$DMG" --key "$APPLE_API_KEY_PATH" --key-id "$APPLE_API_KEY" --issuer "$APPLE_API_ISSUER" --wait
+          xcrun stapler staple "$DMG"
           spctl -a -vvv -t install "$DMG"
+          lipo -info "target/universal-apple-darwin/release/bundle/macos/Sheaf.app/Contents/MacOS/msg2pdf-desktop"
           echo "path=$DMG" >> "$GITHUB_OUTPUT"
 
       - name: Upload DMG to the download host + invalidate CloudFront
@@ -165,3 +182,7 @@ jobs:
           printf '%s\n\n---\n\n**[Get Sheaf →](%s)** — signed, notarized, universal; one-time purchase.\n' \
             "$BODY" "$SALES_URL" > "$RUNNER_TEMP/notes.md"
           gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: sccache stats
+        if: ${{ always() }}
+        run: sccache --show-stats
