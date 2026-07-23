@@ -1,0 +1,167 @@
+name: Release
+
+# Two-stage release automation:
+#   1. release-please watches conventional-commit history on main and opens/maintains
+#      a "release PR" that bumps the version (tauri.conf.json + package.json + version.txt)
+#      and updates CHANGELOG.md. Merging that PR tags the commit and creates a GitHub
+#      release with generated notes.
+#   2. When a release is cut, the publish job builds the signed + notarized universal
+#      .dmg, uploads it to the download host (S3 + CloudFront), and appends a link to the
+#      sales page to the release notes. No binary asset is attached to the GitHub release.
+#
+# The two jobs live in one workflow on purpose: a GitHub release created with the default
+# GITHUB_TOKEN cannot trigger a separate `release`-triggered workflow, so chaining the
+# publish job off the release-please job's output avoids needing a personal access token.
+#
+# The publish job is inert until the AWS OIDC role variable is set (vars.AWS_RELEASE_ROLE_ARN),
+# so this workflow is safe to merge before the signing secrets and download host are wired.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to rebuild + re-publish to the download host (e.g. v1.0.0). Leave blank to build current main."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release PR / tag
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+      version: ${{ steps.rp.outputs.version }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: rp
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    name: Build, notarize & publish DMG
+    needs: [release-please]
+    # Run on a fresh release, or on manual dispatch; skip entirely until the AWS role is provisioned.
+    if: >-
+      always() &&
+      vars.AWS_RELEASE_ROLE_ARN != '' &&
+      (
+        (github.event_name == 'push' && needs.release-please.outputs.release_created == 'true') ||
+        github.event_name == 'workflow_dispatch'
+      )
+    # macOS only by construction: the app links macOS system frameworks and the bundle is
+    # signed + notarized with an Apple Developer ID.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # On a release: the tag release-please just created. On manual dispatch: the given
+          # tag, or the default branch when left blank.
+          ref: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
+
+      - name: Install Rust (stable) + Apple targets
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9
+
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        working-directory: apps/desktop
+        run: pnpm install --frozen-lockfile
+
+      - name: Import Apple Developer ID certificate into a temporary keychain
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          CERT_PATH="$RUNNER_TEMP/certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          echo -n "$APPLE_CERTIFICATE" | base64 --decode -o "$CERT_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" >/dev/null
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
+
+      - name: Build, sign, notarize & staple the universal app
+        working-directory: apps/desktop
+        env:
+          # Signing (identity is also pinned in tauri.conf.json; the cert lives in the keychain above).
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # Notarization: when these are set, `tauri build` notarizes + staples automatically.
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: pnpm tauri build --target universal-apple-darwin
+
+      - name: Locate + verify the notarized DMG
+        id: dmg
+        run: |
+          set -euo pipefail
+          VERSION=$(jq -r .version apps/desktop/src-tauri/tauri.conf.json)
+          DMG="target/universal-apple-darwin/release/bundle/dmg/Sheaf_${VERSION}_universal.dmg"
+          test -f "$DMG"
+          spctl -a -vvv -t install "$DMG"
+          lipo -info "target/universal-apple-darwin/release/bundle/macos/Sheaf.app/Contents/MacOS/msg2pdf-desktop"
+          echo "path=$DMG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_RELEASE_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Upload DMG to the download host + invalidate CloudFront
+        run: |
+          set -euo pipefail
+          aws s3 cp "${{ steps.dmg.outputs.path }}" \
+            "s3://${{ vars.DOWNLOAD_S3_BUCKET }}/${{ vars.DOWNLOAD_S3_KEY }}" \
+            --content-type application/x-apple-diskimage
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.DOWNLOAD_DISTRIBUTION_ID }}" \
+            --paths "/${{ vars.DOWNLOAD_S3_KEY }}"
+
+      - name: Append the sales-page link to the release notes (no asset attached)
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${{ needs.release-please.outputs.tag_name }}"
+          SALES_URL="${{ vars.SALES_PAGE_URL }}"
+          SALES_URL="${SALES_URL:-https://newearth.llc/pricing}"
+          BODY=$(gh release view "$TAG" --json body -q .body)
+          printf '%s\n\n---\n\n**[Get Sheaf →](%s)** — signed, notarized, universal; one-time purchase.\n' \
+            "$BODY" "$SALES_URL" > "$RUNNER_TEMP/notes.md"
+          gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
