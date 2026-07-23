@@ -153,22 +153,26 @@ jobs:
           spctl -a -vvv -t install "$DMG"
           lipo -info "target/universal-apple-darwin/release/bundle/macos/Sheaf.app/Contents/MacOS/msg2pdf-desktop"
           echo "path=$DMG" >> "$GITHUB_OUTPUT"
+          echo "version=$(jq -r .version apps/desktop/src-tauri/tauri.conf.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Upload DMG to the download host + invalidate CloudFront
+      - name: Publish the DMG to the download host
         env:
-          # The object key holds the unlisted prefix that gates the download, so it is a
-          # SECRET (masked in logs) referenced via a shell var so it is never echoed, and
-          # the aws output is quieted so the full key/URL never prints.
           DMG_PATH: ${{ steps.dmg.outputs.path }}
+          VERSION: ${{ steps.dmg.outputs.version }}
           BUCKET: ${{ vars.DOWNLOAD_S3_BUCKET }}
-          KEY: ${{ secrets.DOWNLOAD_S3_KEY }}
-          DIST: ${{ vars.DOWNLOAD_DISTRIBUTION_ID }}
         run: |
           set -euo pipefail
+          # Versioned, product-namespaced key. The bucket has no public read path —
+          # the DMG is served only through short-lived pre-signed URLs minted by the
+          # download Lambda after it verifies a Paddle purchase, so the key is not a
+          # secret and every release is retained for rollback.
+          KEY="sheaf/${VERSION}/Sheaf_${VERSION}_universal.dmg"
           aws s3 cp "$DMG_PATH" "s3://$BUCKET/$KEY" \
             --content-type application/x-apple-diskimage --only-show-errors
-          aws cloudfront create-invalidation --distribution-id "$DIST" \
-            --paths "/$KEY" --query 'Invalidation.Id' --output text
+          # Repoint the download Lambda at this release (no redeploy needed; rolling
+          # back is just setting this pointer to a previous version's key).
+          aws ssm put-parameter --name /sheaf/current-download-key --type String \
+            --value "$KEY" --overwrite --query 'Version' --output text
 
       - name: Append the sales-page link to the release notes (no asset attached)
         if: github.event_name == 'push'
