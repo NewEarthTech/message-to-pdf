@@ -14,7 +14,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 # gen_bindings is a dev-only tool (regenerates src/bindings.ts). Gate it behind
 # the `export` feature so a release `tauri build` (no feature) neither compiles
-# nor bundles it into Sheaf.app. Regenerate with `--features export`.
+# nor bundles it into Message to PDF.app. Regenerate with `--features export`.
 [[bin]]
 name = "gen_bindings"
 path = "src/bin/gen_bindings.rs"

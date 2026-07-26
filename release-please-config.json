@@ -6,7 +6,7 @@
   "bootstrap-sha": "604344cbe0c4d7c0889bd81b2c27945e4f8bb26a",
   "packages": {
     ".": {
-      "package-name": "sheaf",
+      "package-name": "message-to-pdf",
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
         {
