@@ -151,7 +151,7 @@ jobs:
           xcrun notarytool submit "$DMG" --key "$APPLE_API_KEY_PATH" --key-id "$APPLE_API_KEY" --issuer "$APPLE_API_ISSUER" --wait
           xcrun stapler staple "$DMG"
           spctl -a -vvv -t install "$DMG"
-          lipo -info "target/universal-apple-darwin/release/bundle/macos/Sheaf.app/Contents/MacOS/msg2pdf-desktop"
+          lipo -info "target/universal-apple-darwin/release/bundle/macos/Message to PDF.app/Contents/MacOS/msg2pdf-desktop"
           echo "path=$DMG" >> "$GITHUB_OUTPUT"
           echo "version=$(jq -r .version apps/desktop/src-tauri/tauri.conf.json)" >> "$GITHUB_OUTPUT"
 
@@ -184,7 +184,7 @@ jobs:
           SALES_URL="${{ vars.SALES_PAGE_URL }}"
           SALES_URL="${SALES_URL:-https://newearth.llc/pricing}"
           BODY=$(gh release view "$TAG" --json body -q .body)
-          printf '%s\n\n---\n\n**[Get Sheaf →](%s)** — signed, notarized, universal; one-time purchase.\n' \
+          printf '%s\n\n---\n\n**[Get Message to PDF →](%s)** — signed, notarized, universal; one-time purchase.\n' \
             "$BODY" "$SALES_URL" > "$RUNNER_TEMP/notes.md"
           gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
 

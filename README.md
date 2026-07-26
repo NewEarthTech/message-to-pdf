@@ -1,21 +1,21 @@
-# Sheaf
+# Message to PDF
 
-Sheaf exports one iMessage or SMS conversation out of your Mac's `chat.db` and into a PDF that looks like Messages: your bubbles blue on the right, theirs gray on the left, photos inline, tapbacks, replies, edit history, read receipts.
+Message to PDF exports one iMessage or SMS conversation out of your Mac's `chat.db` and into a PDF that looks like Messages: your bubbles blue on the right, theirs gray on the left, photos inline, tapbacks, replies, edit history, read receipts.
 
-Apple ships no export. The good open source exporters emit HTML or plain text, which is right for search and archival and wrong for a document you can print, file, or hand to someone. Sheaf lays out the other thing: one conversation, paginated, looking about like it looked, so a thread worth keeping can outlive the phone.
+Apple ships no export. The good open source exporters emit HTML or plain text, which is right for search and archival and wrong for a document you can print, file, or hand to someone. Message to PDF lays out the other thing: one conversation, paginated, looking about like it looked, so a thread worth keeping can outlive the phone.
 
 Everything happens on your Mac. Nothing is uploaded.
 
-## Get Sheaf
+## Get Message to PDF
 
-Sheaf is a Mac app, and it's free software (GPL-3.0). Two ways to run it:
+Message to PDF is a Mac app, and it's free software (GPL-3.0). Two ways to run it:
 
-- **Buy the build.** A signed, notarized, universal app that opens with a double-click — one-time $29, no subscription, 14-day refund. It's the same program you can build below; paying skips the toolchain and supports the work. → *[sheaf website — link at launch]*
+- **Buy the build.** A signed, notarized, universal app that opens with a double-click — one-time $29, no subscription, 14-day refund. It's the same program you can build below; paying skips the toolchain and supports the work. → *[website — link at launch]*
 - **Build it yourself.** It's all here. Instructions below.
 
 ## Build from source
 
-This is a Cargo workspace: a shared engine (`msg2pdf-core`), a command-line tool (`msg2pdf`), and the desktop app (**Sheaf**, built with [Tauri](https://tauri.app)). You need macOS, a [Rust toolchain](https://rustup.rs), and — for the app — [pnpm](https://pnpm.io). Photo conversion shells out to `/usr/bin/sips`, already on every Mac; nothing else to install.
+This is a Cargo workspace: a shared engine (`msg2pdf-core`), a command-line tool (`msg2pdf`), and the desktop app (**Message to PDF**, built with [Tauri](https://tauri.app)). You need macOS, a [Rust toolchain](https://rustup.rs), and — for the app — [pnpm](https://pnpm.io). Photo conversion shells out to `/usr/bin/sips`, already on every Mac; nothing else to install.
 
 ### The desktop app
 
@@ -27,7 +27,7 @@ pnpm tauri dev      # build and run against a synthetic fixture (no real data, n
 
 A debug run reads a seeded fixture database, so you can try the whole UI without touching your own messages. Point it at a real database with `MSG2PDF_DB=/path/to/chat.db pnpm tauri dev`. A release build (`pnpm tauri build`) reads `~/Library/Messages/chat.db` and is what the distributed app is made from; it signs with the maintainer's Apple Developer ID, so building your own distributable means supplying your own identity (or just running `tauri dev`).
 
-On first launch a release build asks for **Full Disk Access** — macOS keeps `chat.db` private, and this is the switch that lets Sheaf read it, locally. The app walks you through it.
+On first launch a release build asks for **Full Disk Access** — macOS keeps `chat.db` private, and this is the switch that lets Message to PDF read it, locally. The app walks you through it.
 
 ### The command-line tool
 
@@ -73,10 +73,10 @@ crates/
   msg2pdf-core/     the engine (load, contacts, model, assets, pdf, …)
   msg2pdf-cli/      the `msg2pdf` command-line tool
   msg2pdf-fixture/  a synthetic chat.db for tests and dev (no real data, ever)
-apps/desktop/       the Sheaf app — Tauri (Rust) + React/Vite/Tailwind
+apps/desktop/       the Message to PDF app — Tauri (Rust) + React/Vite/Tailwind
 ```
 
-Internal crate and binary names stay `msg2pdf`; the product is Sheaf.
+Internal crate and binary names stay `msg2pdf`; the product is Message to PDF.
 
 ## Limits
 
@@ -88,4 +88,4 @@ Nothing leaves the machine: no network calls, no telemetry, and `chat.db` is ope
 
 ## License
 
-GPL-3.0-or-later. Sheaf is built on two libraries by [ReagentX](https://github.com/ReagentX), both GPL, that do the hard work of reading Apple's data: [`imessage-database`](https://github.com/ReagentX/imessage-exporter) (the Messages schema) and [`crabstep`](https://github.com/ReagentX/crabstep) (the `typedstream` blobs Apple stores message bodies in). Because they are GPL, Sheaf is too — copyleft all the way down. DejaVu Sans is bundled under its own permissive license. The full license text is in [LICENSE](LICENSE).
+GPL-3.0-or-later. Message to PDF is built on two libraries by [ReagentX](https://github.com/ReagentX), both GPL, that do the hard work of reading Apple's data: [`imessage-database`](https://github.com/ReagentX/imessage-exporter) (the Messages schema) and [`crabstep`](https://github.com/ReagentX/crabstep) (the `typedstream` blobs Apple stores message bodies in). Because they are GPL, Message to PDF is too — copyleft all the way down. DejaVu Sans is bundled under its own permissive license. The full license text is in [LICENSE](LICENSE).

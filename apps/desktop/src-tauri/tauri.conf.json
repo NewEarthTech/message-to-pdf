@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Sheaf",
+  "productName": "Message to PDF",
   "version": "1.0.0",
   "identifier": "com.sheaf.desktop",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Sheaf",
+        "title": "Message to PDF",
         "width": 1000,
         "height": 720,
         "minWidth": 720,
