@@ -19,43 +19,24 @@ updates:
       cargo:
         update-types: ["minor", "patch"]
 
-  # Desktop app frontend (pnpm). Same batching.
+  # Every frontend package (apps/desktop, apps/www, packages/ui) lives in ONE
+  # pnpm workspace with a single lockfile at the repo root, so Dependabot has to
+  # run at the root. Pointed at a package subdirectory it edits that
+  # package.json but cannot update the root lockfile, and every install then
+  # dies on ERR_PNPM_OUTDATED_LOCKFILE. That is what broke #43, #47 and #48.
   - package-ecosystem: npm
-    directory: /apps/desktop
+    directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
       frontend:
         update-types: ["minor", "patch"]
-
-  # Marketing site (pnpm). Same batching as the desktop app.
-  - package-ecosystem: npm
-    directory: /apps/www
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-    groups:
-      www:
-        update-types: ["minor", "patch"]
     ignore:
       # TypeScript 7's native compiler does not expose the programmatic API
-      # `astro check` uses, so the site cannot type-check .astro templates on it.
-      # Keeping the checker beats matching version numbers. Drop this ignore when
-      # https://github.com/withastro/roadmap/discussions/1321 lands.
-      - dependency-name: typescript
-        update-types: ["version-update:semver-major"]
-
-  # Shared frontend package (pnpm).
-  - package-ecosystem: npm
-    directory: /packages/ui
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-    groups:
-      ui:
-        update-types: ["minor", "patch"]
-    ignore:
-      # Consumed by apps/www, which is held on TypeScript 6 (see above).
+      # `astro check` uses, so apps/www cannot type-check .astro templates on it
+      # and is held on 6. Keeping the checker beats matching version numbers.
+      # Drop this when https://github.com/withastro/roadmap/discussions/1321
+      # lands. (The desktop app is already on 7, which is current.)
       - dependency-name: typescript
         update-types: ["version-update:semver-major"]

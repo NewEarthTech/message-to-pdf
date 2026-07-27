@@ -12,12 +12,12 @@
     "format": "biome check --write"
   },
   "dependencies": {
+    "@msg2pdf/ui": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "react": "^19",
-    "react-dom": "^19",
-    "@msg2pdf/ui": "workspace:*"
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
@@ -25,9 +25,9 @@
     "@tauri-apps/cli": "^2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^5",
+    "@vitejs/plugin-react": "^6.0.4",
     "tailwindcss": "^4",
     "typescript": "^7",
-    "vite": "^6"
+    "vite": "^8.1.5"
   }
 }
