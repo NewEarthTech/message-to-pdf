@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/* Brand tokens, carried over from the sibling company site (newearth.llc) so a
+   buyer moving between the two properties sees one company. Warm dark base,
+   single gold accent, no second accent anywhere on the page. */
+@theme {
+  --color-base: #3a3a38;
+  --color-base-raised: #403f3c;
+  --color-base-sunken: #2d2d2b;
+  --color-ink: #f5f3ef;
+  --color-accent: #cba980;
+  --color-accent-deep: #93735a;
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Page shell lives here, not as utilities on <body> in index.html. The repo's
+   root .gitignore blanket-ignores *.html as a privacy guard, and Tailwind v4's
+   automatic source detection skips gitignored files, so utility classes written
+   in index.html are silently never generated. Styling the element directly is
+   immune to that. */
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  background-color: var(--color-base);
+  color: var(--color-ink);
+}
+
+/* Visible focus ring for keyboard users on every interactive element. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Staggered rise-in for section content. Presentation only: the content is
+   fully visible without it, and the whole block is gated behind a reduced-motion
+   preference. Delay is set per element via the --d custom property. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes rise {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

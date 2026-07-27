@@ -1,0 +1,69 @@
+name: CI (www)
+
+# Gate for the marketing site only. It shares no code with the Rust workspace or
+# the desktop app, so it runs on cheap Ubuntu and answers in seconds instead of
+# riding inside a job that compiles.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'www/**'
+      - '.github/workflows/ci-www.yml'
+  pull_request:
+    paths:
+      - 'www/**'
+      - '.github/workflows/ci-www.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-www-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  www:
+    name: Lint, typecheck, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: www
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 9
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: lts/*
+          cache: pnpm
+          cache-dependency-path: www/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Biome (lint + format)
+        run: pnpm exec biome check .
+
+      - name: Build (typecheck, bundle, prerender)
+        env:
+          # The build refuses to run on a missing or mismatched env/token pair,
+          # so CI has to name one. PRs build against sandbox: this job only
+          # proves the site compiles and prerenders, it never publishes.
+          VITE_PADDLE_ENV: sandbox
+          VITE_PADDLE_CLIENT_TOKEN: ${{ vars.SANDBOX_PADDLE_CLIENT_TOKEN }}
+        run: pnpm run build
+
+      - name: Check the prerender actually produced content
+        # Guards the thing that silently breaks: if the site ever regresses to a
+        # client-rendered shell, every page still "builds" but ships an empty
+        # root div to crawlers. A real prerender puts the hero headline in the
+        # HTML, so assert on it.
+        run: |
+          set -euo pipefail
+          grep -q "Turn your iMessage history into a PDF worth keeping." dist/index.html
+          grep -q "Frequently asked questions" dist/faq/index.html
+          test -s dist/sitemap.xml
+          test -s dist/robots.txt
+          echo "prerender OK"

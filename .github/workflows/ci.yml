@@ -1,9 +1,17 @@
 name: CI
 
+# The marketing site has its own gate (ci-www.yml) and shares no code with the
+# app, so a website-only change does not need a macOS Rust compile.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'www/**'
+      - 'infra-www/**'
   pull_request:
+    paths-ignore:
+      - 'www/**'
+      - 'infra-www/**'
 
 permissions:
   contents: read

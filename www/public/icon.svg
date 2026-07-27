@@ -1,0 +1,28 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B7CFA"/>
+      <stop offset="1" stop-color="#3A54D6"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="26" flood-color="#101B52" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded-square (squircle-ish) background with a slight transparent margin. -->
+  <rect x="96" y="96" width="832" height="832" rx="200" fill="url(#bg)"/>
+
+  <!-- The message-page: a rounded bubble body (the page) with a received-style tail. -->
+  <g filter="url(#soft)">
+    <path d="M300 636 C 288 724 252 756 214 760 C 300 742 348 712 360 664 Z" fill="#FFFFFF"/>
+    <rect x="300" y="300" width="424" height="372" rx="78" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Page content: a title line in the brand blue, then lighter body lines. -->
+  <rect x="392" y="386" width="212" height="36" rx="18" fill="#3A54D6"/>
+  <g fill="#AEBEF2">
+    <rect x="392" y="452" width="256" height="30" rx="15"/>
+    <rect x="392" y="506" width="256" height="30" rx="15"/>
+    <rect x="392" y="560" width="150" height="30" rx="15"/>
+  </g>
+</svg>
