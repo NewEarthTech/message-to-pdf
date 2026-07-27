@@ -1,8 +1,8 @@
 // Central product identity. The product name is `Message to PDF`; keep it in
 // sync with tauri.conf.json (productName, window title). The bundle identifier
-// (com.sheaf.desktop) and the Cargo crate/binary names are internal and
-// deliberately stay as-is — the identifier is the app's Full Disk Access
-// identity and must never change.
+// (llc.newearth.msg2pdf) and the Cargo crate/binary names are internal and
+// deliberately stay `msg2pdf` — the identifier is the app's Full Disk Access
+// identity, so changing it invalidates every FDA grant already given.
 export const PRODUCT_NAME = "Message to PDF"
 
 export const PRODUCT_TAGLINE = "Export an iMessage conversation to PDF"
