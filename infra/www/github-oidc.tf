@@ -29,17 +29,23 @@ data "aws_iam_policy_document" "deploy_trust" {
     }
 
     # Only the main branch (push or workflow_dispatch on main) may assume this.
+    #
+    # Note the numeric ids: this org's OIDC subject claim is
+    # `repo:OWNER@OWNER_ID/REPO@REPO_ID:ref:...`, not the plain
+    # `repo:OWNER/REPO:ref:...` in most documentation. See variables.tf.
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+      values = [
+        "repo:${var.github_owner}@${var.github_owner_id}/${var.github_repo_name}@${var.github_repo_id}:ref:refs/heads/main"
+      ]
     }
   }
 }
 
 resource "aws_iam_role" "deploy" {
   name                 = "github-actions-message-to-pdf-www-deploy"
-  description          = "Deploy role for ${var.github_repo} (OIDC): marketing site S3 sync + CloudFront invalidation"
+  description          = "Deploy role for ${var.github_owner}/${var.github_repo_name} (OIDC): marketing site S3 sync + CloudFront invalidation"
   assume_role_policy   = data.aws_iam_policy_document.deploy_trust.json
   max_session_duration = 3600
 }
