@@ -166,12 +166,12 @@ jobs:
           # the DMG is served only through short-lived pre-signed URLs minted by the
           # download Lambda after it verifies a Paddle purchase, so the key is not a
           # secret and every release is retained for rollback.
-          KEY="sheaf/${VERSION}/Sheaf_${VERSION}_universal.dmg"
+          KEY="msg2pdf/${VERSION}/MessageToPDF_${VERSION}_universal.dmg"
           aws s3 cp "$DMG_PATH" "s3://$BUCKET/$KEY" \
             --content-type application/x-apple-diskimage --only-show-errors
           # Repoint the download Lambda at this release (no redeploy needed; rolling
           # back is just setting this pointer to a previous version's key).
-          aws ssm put-parameter --name /sheaf/current-download-key --type String \
+          aws ssm put-parameter --name /msg2pdf/current-download-key --type String \
             --value "$KEY" --overwrite --query 'Version' --output text
 
       - name: Append the sales-page link to the release notes (no asset attached)
