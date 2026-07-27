@@ -3,12 +3,12 @@
 # Generated exports — never commit private conversation data.
 *.pdf
 *.html
-# …but the desktop app's and the marketing site's Vite entry points are source, not
-# exports. This also decides what Tailwind can see: its automatic source detection
-# skips gitignored files, so an un-excepted index.html silently produces no
-# utilities for the classes written in it.
+# …but the desktop app.s Vite entry point is source, not an export. This also
+# decides what Tailwind can see: its automatic source detection skips gitignored
+# files, so an un-excepted index.html silently produces no utilities for the
+# classes written in it. (The marketing site needs no exception: Astro has no
+# index.html source file, it emits them.)
 !apps/desktop/index.html
-!www/index.html
 
 # Generated fixture databases — schema.sql + seed.sql are the source of truth.
 *.db

@@ -1,0 +1,26 @@
+---
+import Base from "@/layouts/Base.astro"
+---
+
+<Base
+  title="Page not found | Message to PDF"
+  description="That page does not exist."
+  noindex={true}
+>
+  <main class="px-6 py-24 md:px-10">
+    <div class="mx-auto max-w-[46rem]">
+      <h1 class="font-[680] text-[clamp(1.9rem,4vw,2.4rem)] tracking-[-0.03em]">
+        That page does not exist.
+      </h1>
+      <p class="mt-3 max-w-[52ch] text-[#f5f3ef]/70">
+        The link may be out of date. Everything lives off the home page.
+      </p>
+      <a
+        class="mt-8 inline-block whitespace-nowrap rounded-full bg-[#cba980] px-6 py-3 font-semibold text-[#23231f] transition-opacity hover:opacity-90 active:translate-y-px"
+        href="/"
+      >
+        Back to Message to PDF
+      </a>
+    </div>
+  </main>
+</Base>

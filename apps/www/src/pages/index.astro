@@ -1,0 +1,253 @@
+---
+import { Picture } from "astro:assets"
+
+import { SOURCE_URL, SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+import heroExport from "@/assets/export-sample.png"
+import ContentsGrid from "@/components/react/ContentsGrid"
+import { FAQ_ITEMS } from "@/data/faq"
+import Base from "@/layouts/Base.astro"
+import { softwareApplication } from "@/lib/schema"
+
+// Shape system for the whole site: surfaces are 16px (rounded-2xl), anything
+// interactive is a full pill. Nothing else gets a radius.
+//
+// Motion: entry rise only, staggered by --d, CSS-only and gated behind
+// prefers-reduced-motion in globals.css. It exists to establish reading order on
+// first paint, not for decoration, so nothing loops and nothing moves on scroll.
+const container = "mx-auto w-full max-w-[1140px] px-6 md:px-10"
+const homeFaqs = FAQ_ITEMS.filter((item) => item.onHome)
+
+const linkClass =
+  "border-b border-[#93735a]/45 pb-px text-[#cba980] transition-colors hover:border-[#cba980]"
+---
+
+<Base
+  title="iMessage to PDF for Mac | Message to PDF"
+  description="Message to PDF turns your iMessage and SMS history into a clean, printable PDF, entirely on your Mac. Nothing gets uploaded. $29, one time."
+  jsonLd={softwareApplication()}
+>
+  <main>
+    {/* 1 - Hero: asymmetric split, copy left, the actual product output right. */}
+    <section class="pt-[clamp(2.5rem,6vw,4rem)] pb-[clamp(3rem,7vw,5rem)]">
+      <div class={container}>
+        <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
+          <div class="lg:col-span-7">
+            <h1
+              class="rise max-w-[26ch] font-[680] text-[clamp(2.05rem,4.2vw,2.8rem)] leading-[1.08] tracking-[-0.03em]"
+            >
+              Turn your iMessage history into a PDF worth keeping.
+            </h1>
+            <p
+              class="rise mt-5 max-w-[46ch] text-[#f5f3ef]/70 text-[clamp(1rem,1.6vw,1.15rem)] leading-[1.55]"
+              style="--d: 0.08s"
+            >
+              Message to PDF runs on your Mac and nowhere else. No uploads, no subscription. $29
+              once.
+            </p>
+            <div class="rise mt-8 flex flex-wrap items-center gap-3" style="--d: 0.14s">
+              <a
+                class="whitespace-nowrap rounded-full bg-[#cba980] px-6 py-3 font-semibold text-[#23231f] transition-opacity hover:opacity-90 active:translate-y-px"
+                href="/pricing"
+              >
+                Get it for $29
+              </a>
+              <a
+                class="whitespace-nowrap rounded-full border border-[#93735a]/50 px-6 py-3 font-[560] text-[#f5f3ef] transition-colors hover:border-[#cba980]"
+                href="#how"
+              >
+                How it works
+              </a>
+            </div>
+          </div>
+
+          <figure class="rise lg:col-span-5" style="--d: 0.2s">
+            <div
+              class="overflow-hidden rounded-2xl bg-white shadow-[0_24px_70px_rgba(20,18,14,0.55)]"
+            >
+              <Picture
+                src={heroExport}
+                formats={["avif", "webp"]}
+                widths={[520, 800, 1200]}
+                sizes="(min-width: 1024px) 40vw, 92vw"
+                alt="The first page of an exported PDF: the contact name, a message count, date separators, and iMessage bubbles with read receipts."
+                loading="eager"
+                fetchpriority="high"
+                class="w-full"
+              />
+            </div>
+            <figcaption class="mt-3 text-[#f5f3ef]/65 text-xs">
+              An actual export. Sample conversation, not a real one.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    {/* 2 - What lands in the file. Icon list, two columns, no card boxes. */}
+    <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5.5rem)]">
+      <div class={container}>
+        <h2
+          class="rise max-w-[30ch] font-[660] text-[clamp(1.7rem,3.4vw,2.3rem)] tracking-[-0.025em]"
+        >
+          The conversation, not a data dump.
+        </h2>
+        <p class="rise mt-4 max-w-[58ch] text-[#f5f3ef]/70" style="--d: 0.06s">
+          The PDF is laid out the way the thread reads on your phone, so it is something a person
+          can sit down with.
+        </p>
+        <ContentsGrid />
+      </div>
+    </section>
+
+    {/* 3 - The privacy claim, stated once and plainly. */}
+    <section class="py-[clamp(4rem,9vw,6.5rem)]">
+      <div class={container}>
+        <div class="rise max-w-[64ch] border-[#cba980] border-l-2 pl-6 sm:pl-9">
+          <p
+            class="font-[460] text-[clamp(1.3rem,2.7vw,1.75rem)] leading-[1.45] tracking-[-0.015em]"
+          >
+            Your messages are read on your Mac, written to a file on your Mac, and go nowhere else.
+            There is no account, no sync, no server. The app makes no network calls of its own.
+          </p>
+          <p class="mt-5 text-[#f5f3ef]/60">
+            You do not have to believe that. It is free software, so the code is public and you can
+            read exactly what it does, or build it yourself.{" "}
+            <a class={linkClass} href={SOURCE_URL} target="_blank" rel="noreferrer">Read the source</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {/* 4 - Three steps, hairline columns, no step numbers and no card boxes. */}
+    <section
+      id="how"
+      class="scroll-mt-20 border-[#93735a]/25 border-t py-[clamp(3.5rem,8vw,5.5rem)]"
+    >
+      <div class={container}>
+        <h2
+          class="rise max-w-[20ch] font-[660] text-[clamp(1.7rem,3.4vw,2.3rem)] tracking-[-0.025em]"
+        >
+          Three steps, about a minute.
+        </h2>
+        <div class="mt-10 grid grid-cols-1 gap-8 md:grid-cols-[1.15fr_1fr_1fr] md:gap-x-10">
+          <div class="rise border-[#93735a]/45 border-t pt-5" style="--d: 0.06s">
+            <h3 class="font-[620] text-[#cba980] text-[1.05rem]">Grant Full Disk Access</h3>
+            <p class="mt-2.5 text-[#f5f3ef]/70 text-[0.96rem] leading-[1.55]">
+              macOS keeps your Messages database private, even from you. The app walks you through
+              the one switch in System Settings that lets it read the database on your own machine.
+            </p>
+          </div>
+          <div class="rise border-[#93735a]/45 border-t pt-5" style="--d: 0.12s">
+            <h3 class="font-[620] text-[#cba980] text-[1.05rem]">Pick a conversation</h3>
+            <p class="mt-2.5 text-[#f5f3ef]/70 text-[0.96rem] leading-[1.55]">
+              Choose any one-on-one thread by name or number, and set a date range if you only want
+              part of it.
+            </p>
+          </div>
+          <div class="rise border-[#93735a]/45 border-t pt-5" style="--d: 0.18s">
+            <h3 class="font-[620] text-[#cba980] text-[1.05rem]">Export</h3>
+            <p class="mt-2.5 text-[#f5f3ef]/70 text-[0.96rem] leading-[1.55]">
+              Pick a destination folder and the PDF is written there. Long threads page-break
+              cleanly, so nothing lands half off the edge.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* 5 - The open-source-but-paid question. Prose left, the receipts right:
+           the actual commands that build the thing you would otherwise buy. */}
+    <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5.5rem)]">
+      <div class={container}>
+        <div class="grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
+          <div>
+            <h2 class="rise font-[660] text-[clamp(1.6rem,2.9vw,2.05rem)] tracking-[-0.025em]">
+              It is free software. So why $29?
+            </h2>
+            <p class="rise mt-5 text-[#f5f3ef]/75 leading-[1.65]" style="--d: 0.06s">
+              Message to PDF is licensed under GPL-3.0-or-later. You can read every line, change it,
+              or compile it yourself for nothing, and that will always be true.
+            </p>
+            <p class="rise mt-4 text-[#f5f3ef]/75 leading-[1.65]" style="--d: 0.1s">
+              The $29 buys the finished thing: a universal build, signed and notarized by Apple so
+              it opens with a double click instead of a Gatekeeper warning, kept working across
+              macOS releases, made by someone you can email. It is the same reason people buy
+              software they could technically compile themselves.
+            </p>
+          </div>
+          <div class="rise self-center" style="--d: 0.14s">
+            <p class="text-[#f5f3ef]/65 text-xs">Or build it yourself:</p>
+            <pre
+              class="mt-3 overflow-x-auto rounded-2xl border border-[#93735a]/30 bg-[#23231f] p-5 font-mono text-[0.8rem] text-[#f5f3ef]/80 leading-[1.9]"><code>git clone {SOURCE_URL}
+cd message-to-pdf
+cargo build --release -p msg2pdf</code></pre>
+            <p class="mt-3 text-[#f5f3ef]/65 text-xs">
+              That gives you the command line exporter. The app is the same engine with a window
+              around it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* 6 - Price and the purchase terms in one place. */}
+    <section class="border-[#93735a]/25 border-t py-[clamp(4rem,9vw,6rem)]">
+      <div class={container}>
+        <div class="mx-auto max-w-[52ch] text-center">
+          <h2 class="rise font-[680] text-[clamp(1.9rem,4.4vw,2.7rem)] tracking-[-0.03em]">
+            $29, once.
+          </h2>
+          <p class="rise mt-4 text-[#f5f3ef]/70" style="--d: 0.06s">
+            One payment, no subscription, no account to make. If it is not for you, email us within
+            14 days and we will refund it.
+          </p>
+          <a
+            class="rise mt-8 inline-block whitespace-nowrap rounded-full bg-[#cba980] px-7 py-3.5 font-semibold text-[#23231f] transition-opacity hover:opacity-90 active:translate-y-px"
+            href="/pricing"
+            style="--d: 0.1s"
+          >
+            Get it for $29
+          </a>
+          <p class="rise mt-6 text-[#f5f3ef]/65 text-xs" style="--d: 0.14s">
+            Sold through Paddle, our Merchant of Record. Prices shown in your local currency at
+            checkout.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {/* 7 - The four questions people actually ask, expandable. */}
+    <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5rem)]">
+      <div class={container}>
+        <div class="mx-auto max-w-[70ch]">
+          <h2 class="rise font-[660] text-[clamp(1.6rem,3.2vw,2.1rem)] tracking-[-0.025em]">
+            Before you buy
+          </h2>
+          <div class="mt-8 divide-y divide-[#93735a]/25 border-[#93735a]/25 border-t">
+            {
+              homeFaqs.map((item) => (
+                <details class="group">
+                  <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-[560] text-[#f5f3ef] transition-colors hover:text-[#cba980]">
+                    {item.q}
+                    <span
+                      aria-hidden="true"
+                      class="shrink-0 text-[#cba980] text-xl transition-transform group-open:rotate-45 motion-reduce:transform-none"
+                    >
+                      +
+                    </span>
+                  </summary>
+                  <p class="pb-5 text-[#f5f3ef]/70 text-[0.96rem] leading-[1.6]">{item.a}</p>
+                </details>
+              ))
+            }
+          </div>
+          <p class="mt-7 text-[#f5f3ef]/65 text-sm">
+            More at the <a class={linkClass} href="/faq">full FAQ</a>, or email{" "}
+            <a class={linkClass} href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>

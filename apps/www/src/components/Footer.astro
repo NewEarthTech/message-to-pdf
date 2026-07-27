@@ -1,0 +1,39 @@
+---
+import { SELLER_LEGAL, SELLER_NAME, SOURCE_URL, SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+// Seller identity lives here in full. A payment processor reviewing this site
+// looks for exactly this: who is selling, under what legal entity, how to reach
+// them, and where the policies are.
+const year = new Date().getFullYear()
+---
+
+<footer class="mt-auto border-[#93735a]/25 border-t py-10 text-[#f5f3ef]/65 text-sm">
+  <div class="mx-auto w-full max-w-[1140px] px-6 md:px-10">
+    <div class="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+      <div class="max-w-[38ch] space-y-2">
+        <p class="font-medium text-[#f5f3ef]/80">Message to PDF</p>
+        <p>Sold by {SELLER_LEGAL}. Payments are processed by Paddle as Merchant of Record.</p>
+      </div>
+      <nav class="flex flex-col gap-2.5 sm:text-right">
+        <a class="transition-colors hover:text-[#f5f3ef]" href="/pricing">Pricing</a>
+        <a class="transition-colors hover:text-[#f5f3ef]" href="/faq">FAQ</a>
+        <a class="transition-colors hover:text-[#f5f3ef]" href="/terms">Terms of Service</a>
+        <a class="transition-colors hover:text-[#f5f3ef]" href="/privacy">Privacy Policy</a>
+        <a class="transition-colors hover:text-[#f5f3ef]" href="/refund">Refund Policy</a>
+        <a
+          class="transition-colors hover:text-[#f5f3ef]"
+          href={SOURCE_URL}
+          target="_blank"
+          rel="noreferrer">Source code</a
+        >
+        <a class="transition-colors hover:text-[#f5f3ef]" href={`mailto:${SUPPORT_EMAIL}`}>
+          {SUPPORT_EMAIL}
+        </a>
+      </nav>
+    </div>
+    <p class="mt-9 border-[#93735a]/20 border-t pt-6 text-[#f5f3ef]/65 text-xs">
+      &copy; {year} {SELLER_NAME}. Message to PDF is free software under GPL-3.0-or-later. Apple,
+      macOS, and iMessage are trademarks of Apple Inc., which does not sponsor or endorse this app.
+    </p>
+  </div>
+</footer>

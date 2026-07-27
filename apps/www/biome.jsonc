@@ -1,0 +1,8 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+  "extends": ["../../biome.jsonc"],
+  "files": {
+    // Biome does not parse .astro component syntax; `astro check` covers those.
+    "includes": ["!public", "!dist", "!.astro", "!**/*.astro"]
+  }
+}

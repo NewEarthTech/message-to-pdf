@@ -1,0 +1,34 @@
+---
+import { SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+import Legal from "@/layouts/Legal.astro"
+---
+
+<Legal
+  title="Refund Policy"
+  effective="July 26, 2026"
+  description="A full refund within 14 days of purchase, issued by Paddle to your original payment method. Email us and we will approve it."
+>
+  <p>We want you to be happy with Message to PDF.</p>
+
+  <h2>14-day refunds</h2>
+  <p>
+    If Message to PDF isn't right for you, you can request a full refund within 14 days of your
+    purchase. Just email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> from the address you
+    used to buy, or reply to your Paddle receipt. We'll approve it, no complicated questions asked.
+  </p>
+
+  <h2>How refunds are processed</h2>
+  <p>
+    The Software is sold through <a href="https://www.paddle.com" target="_blank" rel="noreferrer"
+      >Paddle</a
+    >, our Merchant of Record. Refunds are issued by Paddle to your original payment method and
+    typically appear within 5 to 10 business days, depending on your bank. You can also request a
+    refund directly through the link in your Paddle purchase receipt.
+  </p>
+
+  <h2>Questions</h2>
+  <p>
+    Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> and we'll help.
+  </p>
+</Legal>

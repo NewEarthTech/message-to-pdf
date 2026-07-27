@@ -1,0 +1,51 @@
+---
+import { SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+import { FAQ_GROUPS, FAQ_ITEMS } from "@/data/faq"
+import Base from "@/layouts/Base.astro"
+import { faqPage } from "@/lib/schema"
+
+const linkClass =
+  "text-[#f5f3ef] underline underline-offset-2 transition-colors hover:text-[#cba980]"
+---
+
+<Base
+  title="FAQ | Message to PDF"
+  description="Full Disk Access, privacy, open source, refunds, group chats, and exactly what Message to PDF exports from your iMessage history."
+  jsonLd={faqPage()}
+>
+  <main class="px-6 py-16 md:px-10">
+    <div class="mx-auto max-w-[46rem]">
+      <h1 class="font-[680] text-[clamp(1.9rem,4vw,2.4rem)] tracking-[-0.03em]">
+        Frequently asked questions
+      </h1>
+
+      {
+        FAQ_GROUPS.map((group) => (
+          <section class="mt-12 first:mt-10">
+            <h2 class="border-[#93735a]/45 border-b pb-3 font-[620] text-[#cba980] text-[1.05rem]">
+              {group}
+            </h2>
+            <div class="mt-2">
+              {FAQ_ITEMS.filter((item) => item.group === group).map((item) => (
+                <div class="py-6">
+                  <h3 class="font-[620] text-[#f5f3ef] text-[1.02rem]">{item.q}</h3>
+                  {item.html ? (
+                    <p class="mt-2.5 text-[#f5f3ef]/70 leading-[1.65]" set:html={item.html} />
+                  ) : (
+                    <p class="mt-2.5 text-[#f5f3ef]/70 leading-[1.65]">{item.a}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+
+      <p class="mt-10 border-[#93735a]/25 border-t pt-8 text-[#f5f3ef]/65 text-sm">
+        Still stuck? Email <a class={linkClass} href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+        and a person will answer.
+      </p>
+    </div>
+  </main>
+</Base>

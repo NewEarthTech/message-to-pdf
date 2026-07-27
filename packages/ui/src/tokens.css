@@ -1,0 +1,22 @@
+/* Brand tokens for New Earth web surfaces, carried over from the company site
+   (newearth.llc) so a buyer moving between properties sees one company. Warm
+   dark base, a single gold accent, no second accent anywhere.
+
+   Deliberately NOT imported by the desktop app: that app is a native-feeling
+   macOS utility in the system light appearance, and it should look like the
+   platform rather than like the brand page. This file is for web surfaces.
+
+   Contrast floor: muted body text must stay at or above 65% opacity of
+   --color-ink. At 45% it computes to 3.49:1 against --color-base, under the
+   WCAG AA 4.5:1 minimum; 65% clears 5.1:1 on every surface tone below. */
+@theme {
+  --color-base: #3a3a38;
+  --color-base-raised: #403f3c;
+  --color-base-sunken: #2d2d2b;
+  --color-ink: #f5f3ef;
+  --color-accent: #cba980;
+  --color-accent-deep: #93735a;
+  --color-on-accent: #23231f;
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
