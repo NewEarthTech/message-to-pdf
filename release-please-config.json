@@ -8,7 +8,7 @@
     ".": {
       "package-name": "message-to-pdf",
       "changelog-path": "CHANGELOG.md",
-      "exclude-paths": ["apps/www"],
+      "exclude-paths": ["apps/www", "infra", ".github"],
       "extra-files": [
         {
           "type": "json",
