@@ -1,0 +1,9 @@
+{
+  "name": "message-to-pdf",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:desktop": "pnpm --filter msg2pdf-desktop build",
+    "build:www": "pnpm --filter message-to-pdf-www build"
+  }
+}
