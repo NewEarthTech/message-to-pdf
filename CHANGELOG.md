@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/NewEarthTech/message-to-pdf/compare/v1.0.0...v1.0.1) (2026-07-27)
+
+
+### Bug Fixes
+
+* upgrade Astro past its security advisories and repair the deploy role ([#44](https://github.com/NewEarthTech/message-to-pdf/issues/44)) ([77d5d06](https://github.com/NewEarthTech/message-to-pdf/commit/77d5d06e18e01920753b568f4015a5c248433df5))
+
 ## [1.0.0](https://github.com/NewEarthTech/message-to-pdf/compare/v0.9.0...v1.0.0) (2026-07-23)
 
 
