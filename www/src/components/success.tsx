@@ -69,7 +69,7 @@ export default function Success() {
             </p>
           )}
 
-          <p className="mt-6 text-[#f5f3ef]/50 text-xs">
+          <p className="mt-6 text-[#f5f3ef]/65 text-xs">
             Transaction:{" "}
             <span className="break-all font-mono">
               {txn ?? "(none, did you arrive here directly?)"}
@@ -77,7 +77,7 @@ export default function Success() {
           </p>
         </div>
 
-        <p className="mt-6 text-[#f5f3ef]/50 text-xs leading-relaxed">
+        <p className="mt-6 text-[#f5f3ef]/65 text-xs leading-relaxed">
           Keep the email: your download link works any time. Trouble? Write to{" "}
           <A href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</A>. By downloading you accept the
           GPL-3.0-or-later license shipped in the app.

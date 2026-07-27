@@ -31,7 +31,7 @@ export default function Pricing() {
             <h2 className="font-[640] text-2xl">{TIER.name}</h2>
             <div className="text-right">
               <div className="font-[680] text-3xl">{checkout.price ?? "$29.00"}</div>
-              <div className="text-[#f5f3ef]/50 text-xs">one time, incl. tax</div>
+              <div className="text-[#f5f3ef]/65 text-xs">one time, incl. tax</div>
             </div>
           </div>
           <p className="mt-4 max-w-[52ch] text-[#f5f3ef]/70 text-sm leading-relaxed">
@@ -74,7 +74,7 @@ export default function Pricing() {
           )}
         </div>
 
-        <p className="mt-6 text-[#f5f3ef]/50 text-xs leading-relaxed">
+        <p className="mt-6 text-[#f5f3ef]/65 text-xs leading-relaxed">
           Sold by New Earth Technologies through <A href="https://www.paddle.com">Paddle</A>, our
           reseller and Merchant of Record. By purchasing you agree to our{" "}
           <A href="/terms">Terms of Service</A> and <A href="/privacy">Privacy Policy</A>. The app

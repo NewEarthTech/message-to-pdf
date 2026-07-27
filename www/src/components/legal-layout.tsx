@@ -19,10 +19,10 @@ export function LegalLayout({
           <h1 className="font-[680] text-[#f5f3ef] text-[clamp(1.9rem,4vw,2.4rem)] tracking-[-0.03em]">
             {title}
           </h1>
-          <p className="text-[#f5f3ef]/50 text-xs">Effective {effective}</p>
+          <p className="text-[#f5f3ef]/65 text-xs">Effective {effective}</p>
         </div>
         {children}
-        <p className="pt-8 text-[#f5f3ef]/50 text-xs">
+        <p className="pt-8 text-[#f5f3ef]/65 text-xs">
           <a
             className="underline underline-offset-2 transition-colors hover:text-[#f5f3ef]"
             href="/"

@@ -6,7 +6,7 @@ import { SUPPORT_EMAIL } from "@/paddle-config"
 export default function Footer() {
   const year = new Date().getFullYear()
   return (
-    <footer className="mt-auto border-[#93735a]/25 border-t py-10 text-[#f5f3ef]/55 text-sm">
+    <footer className="mt-auto border-[#93735a]/25 border-t py-10 text-[#f5f3ef]/65 text-sm">
       <div className="mx-auto w-full max-w-[1140px] px-6 md:px-10">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-[38ch] space-y-2">
@@ -46,7 +46,7 @@ export default function Footer() {
             </a>
           </nav>
         </div>
-        <p className="mt-9 border-[#93735a]/20 border-t pt-6 text-[#f5f3ef]/45 text-xs">
+        <p className="mt-9 border-[#93735a]/20 border-t pt-6 text-[#f5f3ef]/65 text-xs">
           © {year} New Earth Technologies. Message to PDF is free software under GPL-3.0-or-later.
           Apple, macOS, and iMessage are trademarks of Apple Inc., which does not sponsor or endorse
           this app.

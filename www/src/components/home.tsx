@@ -121,7 +121,7 @@ export default function Home() {
                   decoding="async"
                 />
               </div>
-              <figcaption className="mt-3 text-[#f5f3ef]/45 text-xs">
+              <figcaption className="mt-3 text-[#f5f3ef]/65 text-xs">
                 An actual export. Sample conversation, not a real one.
               </figcaption>
             </figure>
@@ -246,7 +246,7 @@ export default function Home() {
               </p>
             </div>
             <div className="rise self-center" style={delay(0.14)}>
-              <p className="text-[#f5f3ef]/50 text-xs">Or build it yourself:</p>
+              <p className="text-[#f5f3ef]/65 text-xs">Or build it yourself:</p>
               <pre className="mt-3 overflow-x-auto rounded-2xl border border-[#93735a]/30 bg-[#23231f] p-5 font-mono text-[#f5f3ef]/80 text-[0.8rem] leading-[1.9]">
                 <code>
                   git clone https://github.com/NewEarthTech/message-to-pdf{"\n"}
@@ -254,7 +254,7 @@ export default function Home() {
                   cargo build --release -p msg2pdf
                 </code>
               </pre>
-              <p className="mt-3 text-[#f5f3ef]/45 text-xs">
+              <p className="mt-3 text-[#f5f3ef]/65 text-xs">
                 That gives you the command line exporter. The app is the same engine with a window
                 around it.
               </p>
@@ -281,7 +281,7 @@ export default function Home() {
             >
               Get it for $29
             </a>
-            <p className="rise mt-6 text-[#f5f3ef]/45 text-xs" style={delay(0.14)}>
+            <p className="rise mt-6 text-[#f5f3ef]/65 text-xs" style={delay(0.14)}>
               Sold through Paddle, our Merchant of Record. Prices shown in your local currency at
               checkout.
             </p>
@@ -296,7 +296,7 @@ export default function Home() {
             <h2 className="rise font-[660] text-[clamp(1.6rem,3.2vw,2.1rem)] tracking-[-0.025em]">
               Before you buy
             </h2>
-            <div className="mt-8 divide-y divide-[#93735a]/25 border-[#93735a]/25 border-t border-b">
+            <div className="mt-8 divide-y divide-[#93735a]/25 border-[#93735a]/25 border-t">
               {faqs.map((item, i) => (
                 <details className="group rise" key={item.q} style={delay(0.06 + i * 0.04)}>
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-[560] text-[#f5f3ef] transition-colors hover:text-[#cba980]">
