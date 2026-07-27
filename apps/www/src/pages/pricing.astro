@@ -1,0 +1,44 @@
+---
+import Checkout from "@/components/react/Checkout"
+import Base from "@/layouts/Base.astro"
+import { softwareApplication } from "@/lib/schema"
+---
+
+<Base
+  title="Pricing, $29 one time | Message to PDF"
+  description="Message to PDF costs $29 once. No subscription, no account, no license key. 14-day refund, sold through Paddle as Merchant of Record."
+  jsonLd={softwareApplication()}
+>
+  <main class="px-6 py-16 md:px-10">
+    <div class="mx-auto max-w-[46rem]">
+      <h1 class="font-[680] text-[clamp(2rem,4.5vw,2.6rem)] tracking-[-0.03em]">
+        One price, one payment.
+      </h1>
+      <p class="mt-3 max-w-[52ch] text-[#f5f3ef]/70">
+        No subscription and no account. Prices are shown in your local currency, tax included where
+        it applies.
+      </p>
+
+      <div class="mt-10">
+        {/* The only reason this page needs JavaScript: Paddle.js fetches the
+            localized price and opens the overlay. */}
+        <Checkout client:load />
+      </div>
+
+      <p class="mt-6 text-[#f5f3ef]/65 text-xs leading-relaxed">
+        Sold by New Earth Technologies through <a
+          class="text-[#f5f3ef] underline underline-offset-2 transition-colors hover:text-[#cba980]"
+          href="https://www.paddle.com"
+          target="_blank"
+          rel="noreferrer">Paddle</a
+        >, our reseller and Merchant of Record. By purchasing you agree to our <a
+          class="text-[#f5f3ef] underline underline-offset-2 transition-colors hover:text-[#cba980]"
+          href="/terms">Terms of Service</a
+        > and <a
+          class="text-[#f5f3ef] underline underline-offset-2 transition-colors hover:text-[#cba980]"
+          href="/privacy">Privacy Policy</a
+        >. The app itself is licensed to you under GPL-3.0-or-later.
+      </p>
+    </div>
+  </main>
+</Base>

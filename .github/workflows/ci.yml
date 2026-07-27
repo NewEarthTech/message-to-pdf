@@ -1,9 +1,17 @@
 name: CI
 
+# The marketing site has its own gate (ci-www.yml) and shares no code with the
+# app, so a website-only change does not need a macOS Rust compile.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'apps/www/**'
+      - 'infra/**'
   pull_request:
+    paths-ignore:
+      - 'apps/www/**'
+      - 'infra/**'
 
 permissions:
   contents: read
@@ -30,9 +38,9 @@ jobs:
         with:
           node-version: lts/*
           cache: pnpm
-          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
+      # One pnpm workspace, so install runs at the root and links every package.
       - name: Install frontend dependencies
-        working-directory: apps/desktop
         run: pnpm install --frozen-lockfile
       - name: Biome (lint + format)
         working-directory: apps/desktop

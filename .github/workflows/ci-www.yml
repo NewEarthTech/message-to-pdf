@@ -1,0 +1,81 @@
+name: CI (www)
+
+# Gate for the marketing site only. It shares no code with the Rust workspace,
+# so it runs on cheap Ubuntu and answers in seconds instead of riding inside a
+# job that compiles. packages/ui is in the triggers because the site consumes it.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/www/**'
+      - 'packages/ui/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/ci-www.yml'
+  pull_request:
+    paths:
+      - 'apps/www/**'
+      - 'packages/ui/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/ci-www.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-www-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  www:
+    name: Lint, typecheck, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 9
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: lts/*
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # One pnpm workspace, so install runs at the root and links every package.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Biome (lint + format)
+        working-directory: apps/www
+        run: pnpm exec biome check .
+
+      - name: Build (astro check, then static build)
+        working-directory: apps/www
+        env:
+          # The build refuses to run on a missing or mismatched env/token pair,
+          # so CI has to name one. PRs build against sandbox: this job only
+          # proves the site compiles and renders, it never publishes.
+          PUBLIC_PADDLE_ENV: sandbox
+          PUBLIC_PADDLE_CLIENT_TOKEN: ${{ vars.SANDBOX_PADDLE_CLIENT_TOKEN }}
+        run: pnpm run build
+
+      - name: Check the pages actually carry content
+        working-directory: apps/www
+        # Guards the thing that silently breaks: if a page ever regresses to
+        # client-only rendering, it still "builds" but ships an empty shell to
+        # crawlers. Assert on real rendered copy, and on the routes that must
+        # stay free of JavaScript.
+        run: |
+          set -euo pipefail
+          grep -q "Turn your iMessage history into a PDF worth keeping." dist/index.html
+          grep -q "Frequently asked questions" dist/faq/index.html
+          grep -q "Privacy and permissions" dist/faq/index.html
+          test -s dist/sitemap-index.xml
+          test -s dist/robots.txt
+          for page in index.html faq/index.html terms/index.html privacy/index.html refund/index.html; do
+            if grep -q '_astro/.*\.js' "dist/$page"; then
+              echo "$page unexpectedly ships JavaScript; only /pricing and /success should"
+              exit 1
+            fi
+          done
+          echo "content and zero-JS checks OK"

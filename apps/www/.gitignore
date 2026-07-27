@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# Astro's generated types and content cache.
+.astro/
+
+# Local Paddle env (the client token is public-safe, but the environment and its
+# token are chosen together at build time, so this stays out of git).
+.env
+.env.local

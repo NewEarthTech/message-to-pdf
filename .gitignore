@@ -3,20 +3,30 @@
 # Generated exports — never commit private conversation data.
 *.pdf
 *.html
-# …but the desktop app's Vite entry point and the marketing site's pages are source, not exports.
+# …but the desktop app.s Vite entry point is source, not an export. This also
+# decides what Tailwind can see: its automatic source detection skips gitignored
+# files, so an un-excepted index.html silently produces no utilities for the
+# classes written in it. (The marketing site needs no exception: Astro has no
+# index.html source file, it emits them.)
 !apps/desktop/index.html
-!site/*.html
 
 # Generated fixture databases — schema.sql + seed.sql are the source of truth.
 *.db
 # Runtime-written fixture attachment copies (source image: crates/msg2pdf-fixture/lunch.jpeg).
 *-attachments/
 
-# Desktop app frontend
+# Frontend build output (desktop app and marketing site)
 node_modules/
 dist/
+dist-ssr/
 
 # Local Claude Code config
 CLAUDE.md
 CLAUDE.local.md
 .claude/
+
+# Terraform working dirs and state (the .lock.hcl IS tracked: it pins providers)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars

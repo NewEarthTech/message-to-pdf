@@ -101,10 +101,11 @@ jobs:
         with:
           node-version: lts/*
           cache: pnpm
-          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
+      # One pnpm workspace, so install runs at the root and links every package
+      # (the desktop app consumes packages/ui).
       - name: Install frontend dependencies
-        working-directory: apps/desktop
         run: pnpm install --frozen-lockfile
 
       - name: Configure AWS credentials (OIDC)

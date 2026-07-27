@@ -1,0 +1,17 @@
+---
+import Download from "@/components/react/Download"
+import Base from "@/layouts/Base.astro"
+---
+
+<Base
+  title="Thank you | Message to PDF"
+  description="Your Message to PDF download."
+  noindex={true}
+>
+  <main class="px-6 py-16 md:px-10">
+    <div class="mx-auto max-w-[46rem]">
+      {/* The transaction id only exists at runtime, so this is an island. */}
+      <Download client:load />
+    </div>
+  </main>
+</Base>

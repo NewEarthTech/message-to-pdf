@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "@msg2pdf/ui/tokens.css";
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Page shell lives here rather than as utilities on <body>: the repo's root
+   .gitignore blanket-ignores *.html as a privacy guard, and Tailwind's source
+   detection skips gitignored files, so classes written in raw HTML can silently
+   generate nothing. Styling the element directly is immune to that. */
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  background-color: var(--color-base);
+  color: var(--color-ink);
+}
+
+/* Visible focus ring for keyboard users on every interactive element. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Staggered rise-in for section content. Presentation only: the content is
+   fully visible without it, and the whole block is gated behind a reduced-motion
+   preference. Delay is set per element via the --d custom property. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes rise {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

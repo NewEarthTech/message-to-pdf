@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /success
+
+Sitemap: https://message-to-pdf.com/sitemap-index.xml

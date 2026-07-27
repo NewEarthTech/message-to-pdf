@@ -32,14 +32,16 @@ runs:
       with:
         node-version: lts/*
         cache: pnpm
-        cache-dependency-path: apps/desktop/pnpm-lock.yaml
+        cache-dependency-path: pnpm-lock.yaml
 
     # tauri::generate_context! embeds ../dist at compile time, so the frontend must
     # be built before anything compiles the desktop crate (incl. its tests). ~7s,
     # cheaper than waiting out a separate job and round-tripping an artifact.
     - name: Build frontend (for generate_context!)
       shell: bash
-      working-directory: apps/desktop
       run: |
+        # One pnpm workspace, so install runs at the root and links every package
+        # (the desktop app consumes packages/ui). Only the desktop app is built:
+        # the marketing site has its own gate and is not embedded in the binary.
         pnpm install --frozen-lockfile
-        pnpm build
+        pnpm --filter msg2pdf-desktop build

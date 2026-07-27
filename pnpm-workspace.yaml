@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Both need their postinstall to run: esbuild fetches its platform binary, and
+# sharp is what Astro uses to optimize images at build time. Without sharp the
+# site build fails on the first <Image /> it meets.
+allowBuilds:
+  esbuild: true
+  sharp: true

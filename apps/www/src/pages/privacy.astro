@@ -1,0 +1,55 @@
+---
+import { SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+import Legal from "@/layouts/Legal.astro"
+---
+
+<Legal
+  title="Privacy Policy"
+  effective="July 26, 2026"
+  description="Message to PDF runs entirely on your Mac. Your messages, attachments, and exported PDFs never leave your computer, and we never receive them."
+>
+  <p>
+    New Earth Technologies ("we") respects your privacy. This policy explains what we do, and
+    importantly do not, collect.
+  </p>
+
+  <h2>1. The app does not collect your messages</h2>
+  <p>
+    Our software, Message to PDF, runs entirely on your Mac. It reads your local Messages database
+    and attachments only to build the PDF you asked for, and writes that PDF to the folder you
+    choose. Your messages, attachments, and the PDFs you create never leave your computer. We do not
+    upload, transmit, receive, store, or have any access to your message content or the files you
+    export. The app requests macOS Full Disk Access only so it can read your local Messages database
+    on your own machine.
+  </p>
+
+  <h2>2. Information the website collects</h2>
+  <p>
+    We do not use third-party analytics, advertising, or tracking cookies on message-to-pdf.com. Our
+    hosting provider (Amazon Web Services) may keep standard server request logs, such as IP
+    addresses, for security and operations. If you email us, we receive the information you send
+    (such as your email address and message) so we can reply. We do not sell your personal
+    information.
+  </p>
+
+  <h2>3. Payments</h2>
+  <p>
+    Purchases are processed by <a href="https://www.paddle.com" target="_blank" rel="noreferrer"
+      >Paddle</a
+    >, our Merchant of Record, which acts as the data controller for the payment information it
+    collects at checkout (such as your name, billing address, and payment details). We receive only
+    limited transaction information (such as a confirmation and the country, for tax purposes). See
+    <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noreferrer"
+      >Paddle's privacy notice</a
+    > for how they handle your data.
+  </p>
+
+  <h2>4. Your rights and contact</h2>
+  <p>
+    Depending on where you live, you may have rights to access, correct, or delete personal
+    information we hold about you. To exercise them, or for any privacy question, email <a
+      href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a
+    >. We may update this policy and will post changes here with a new effective date.
+  </p>
+</Legal>

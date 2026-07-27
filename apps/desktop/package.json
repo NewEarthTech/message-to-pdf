@@ -16,7 +16,8 @@
     "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "@msg2pdf/ui": "workspace:*"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
