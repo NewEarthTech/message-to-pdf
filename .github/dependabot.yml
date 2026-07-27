@@ -28,3 +28,34 @@ updates:
     groups:
       frontend:
         update-types: ["minor", "patch"]
+
+  # Marketing site (pnpm). Same batching as the desktop app.
+  - package-ecosystem: npm
+    directory: /apps/www
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      www:
+        update-types: ["minor", "patch"]
+    ignore:
+      # TypeScript 7's native compiler does not expose the programmatic API
+      # `astro check` uses, so the site cannot type-check .astro templates on it.
+      # Keeping the checker beats matching version numbers. Drop this ignore when
+      # https://github.com/withastro/roadmap/discussions/1321 lands.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+
+  # Shared frontend package (pnpm).
+  - package-ecosystem: npm
+    directory: /packages/ui
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      ui:
+        update-types: ["minor", "patch"]
+    ignore:
+      # Consumed by apps/www, which is held on TypeScript 6 (see above).
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
