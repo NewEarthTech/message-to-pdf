@@ -2,6 +2,7 @@
   "name": "message-to-pdf",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.17.0",
   "scripts": {
     "build:desktop": "pnpm --filter msg2pdf-desktop build",
     "build:www": "pnpm --filter message-to-pdf-www build"
