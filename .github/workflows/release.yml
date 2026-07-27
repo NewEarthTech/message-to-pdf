@@ -26,9 +26,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing tag to rebuild + re-publish to the download host (e.g. v1.0.0). Leave blank to build current main."
-        required: false
-        default: ""
+        description: "Existing release tag to rebuild and re-publish to the download host (e.g. v1.0.0)."
+        required: true
 
 permissions:
   contents: write
@@ -77,9 +76,31 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # On a release: the tag release-please just created. On manual dispatch: the given
-          # tag, or the default branch when left blank.
+          # On a release: the tag release-please just created. On manual dispatch: the
+          # given tag, which is required (see the guard below).
           ref: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
+          fetch-depth: 0
+
+      # A manual dispatch publishes to a key derived from version.txt, so a run
+      # that checked out anything other than the matching release tag would
+      # overwrite a shipped artifact with a different binary under its name.
+      # Refuse rather than trust the operator to pass the right thing.
+      - name: Refuse to publish anything but its own release tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          TAG='${{ inputs.tag }}'
+          git rev-parse -q --verify "refs/tags/$TAG" >/dev/null \
+            || { echo "::error::'$TAG' is not a tag in this repository"; exit 1; }
+          HEAD_SHA="$(git rev-parse HEAD)"
+          TAG_SHA="$(git rev-parse "refs/tags/$TAG^{commit}")"
+          [ "$HEAD_SHA" = "$TAG_SHA" ] \
+            || { echo "::error::checked out $HEAD_SHA but $TAG is $TAG_SHA"; exit 1; }
+          WANT="${TAG#v}"
+          GOT="$(cat version.txt)"
+          [ "$WANT" = "$GOT" ] \
+            || { echo "::error::version.txt at $TAG reads '$GOT', expected '$WANT'"; exit 1; }
+          echo "republishing $TAG (version $GOT) from $TAG_SHA"
 
       - name: Install Rust (stable) + Apple targets
         uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
