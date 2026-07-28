@@ -10,7 +10,7 @@ Everything happens on your Mac. Nothing is uploaded.
 
 Message to PDF is a Mac app, and it's free software (GPL-3.0). Two ways to run it:
 
-- **Buy the build.** A signed, notarized, universal app that opens with a double-click — one-time $29, no subscription, 14-day refund. It's the same program you can build below; paying skips the toolchain and supports the work. → *[website — link at launch]*
+- **Buy the build.** A signed, notarized, universal app that opens with a double-click — one-time $29, no subscription, 14-day refund. It's the same program you can build below; paying skips the toolchain and supports the work. → [message-to-pdf.com](https://message-to-pdf.com/pricing)
 - **Build it yourself.** It's all here. Instructions below.
 
 ## Build from source
