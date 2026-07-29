@@ -29,7 +29,7 @@ msg2pdf-fixture = { path = "../../../crates/msg2pdf-fixture" }
 tauri = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
-tauri-typed-ipc = "=0.1.8"
+tauri-typed-ipc = "=0.1.9"
 specta = { version = "=2.0.0-rc.25", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 
