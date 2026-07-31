@@ -24,25 +24,27 @@ export function AboutDialog({ onClose }: { onClose: () => void }) {
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-6 dark:bg-black/50">
       <div
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-neutral-800"
         role="dialog"
         aria-modal="true"
         aria-label={`About ${PRODUCT_NAME}`}
       >
         <div className="flex items-baseline justify-between">
           <h2 className="font-semibold text-xl">{PRODUCT_NAME}</h2>
-          {version && <span className="text-neutral-400 text-sm">v{version}</span>}
+          {version && (
+            <span className="text-neutral-400 text-sm dark:text-neutral-500">v{version}</span>
+          )}
         </div>
-        <p className="mt-1 text-neutral-500 text-sm">{PRODUCT_TAGLINE}</p>
+        <p className="mt-1 text-neutral-500 text-sm dark:text-neutral-400">{PRODUCT_TAGLINE}</p>
 
         <div className="mt-5 space-y-3 text-sm">
-          <p className="text-neutral-700">
+          <p className="text-neutral-700 dark:text-neutral-300">
             Free software under the{" "}
             <button
               type="button"
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline dark:text-blue-400"
               onClick={() => void openUrl(LICENSE_URL)}
             >
               GNU GPL v3 (or later)
@@ -52,25 +54,30 @@ export function AboutDialog({ onClose }: { onClose: () => void }) {
           <p>
             <button
               type="button"
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline dark:text-blue-400"
               onClick={() => void openUrl(SOURCE_URL)}
             >
               View source code
             </button>
           </p>
-          <div className="rounded-md bg-neutral-50 p-3">
-            <p className="font-medium text-neutral-500 text-xs uppercase tracking-wide">Built on</p>
+          <div className="rounded-md bg-neutral-50 p-3 dark:bg-neutral-900">
+            <p className="font-medium text-neutral-500 text-xs uppercase tracking-wide dark:text-neutral-400">
+              Built on
+            </p>
             <ul className="mt-1 space-y-1">
               {CREDITS.map((c) => (
                 <li key={c.name}>
                   <button
                     type="button"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600 hover:underline dark:text-blue-400"
                     onClick={() => void openUrl(c.url)}
                   >
                     {c.name}
                   </button>
-                  <span className="text-neutral-500"> by {c.author} — GPL-3.0</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">
+                    {" "}
+                    by {c.author} — GPL-3.0
+                  </span>
                 </li>
               ))}
             </ul>
@@ -81,7 +88,7 @@ export function AboutDialog({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md bg-neutral-100 px-4 py-2 font-medium text-neutral-700 text-sm hover:bg-neutral-200"
+            className="rounded-md bg-neutral-100 px-4 py-2 font-medium text-neutral-700 text-sm hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600"
           >
             Close
           </button>
