@@ -4,6 +4,8 @@ import { Picture } from "astro:assets"
 import { SOURCE_URL, SUPPORT_EMAIL } from "@msg2pdf/ui"
 
 import heroExport from "@/assets/export-sample.png"
+import appDark from "@/assets/app-dark.png"
+import appLight from "@/assets/app-light.png"
 import ContentsGrid from "@/components/react/ContentsGrid"
 import { FAQ_ITEMS } from "@/data/faq"
 import Base from "@/layouts/Base.astro"
@@ -84,7 +86,55 @@ const linkClass =
       </div>
     </section>
 
-    {/* 2 - What lands in the file. Icon list, two columns, no card boxes. */}
+    {/* 2 - The app itself, not just the file it makes. Full-width showcase, both appearances. */}
+    <section class="py-[clamp(3rem,7vw,5rem)]">
+      <div class={container}>
+        <h2
+          class="rise max-w-[28ch] font-[660] text-[clamp(1.7rem,3.4vw,2.3rem)] tracking-[-0.025em]"
+        >
+          It looks like it belongs on your Mac.
+        </h2>
+        <p class="rise mt-4 max-w-[58ch] text-[#f5f3ef]/70" style="--d: 0.06s">
+          A native macOS app that follows your system's light or dark appearance automatically. No
+          browser tab pretending to be a desktop app.
+        </p>
+        <div class="mt-9 space-y-5">
+          <figure
+            class="rise overflow-hidden rounded-2xl shadow-[0_24px_70px_rgba(20,18,14,0.55)]"
+            style="--d: 0.1s"
+          >
+            <Picture
+              src={appDark}
+              formats={["avif", "webp"]}
+              widths={[560, 900, 1140]}
+              sizes="(min-width: 1024px) 1140px, 92vw"
+              alt="Message to PDF's export screen in dark appearance: a conversation list on the left, and export controls (date range, destination, Export to PDF) on the right."
+              loading="lazy"
+              class="w-full"
+            />
+          </figure>
+          <figure
+            class="rise overflow-hidden rounded-2xl shadow-[0_24px_70px_rgba(20,18,14,0.55)]"
+            style="--d: 0.16s"
+          >
+            <Picture
+              src={appLight}
+              formats={["avif", "webp"]}
+              widths={[560, 900, 1140]}
+              sizes="(min-width: 1024px) 1140px, 92vw"
+              alt="The same export screen in light appearance."
+              loading="lazy"
+              class="w-full"
+            />
+          </figure>
+        </div>
+        <p class="rise mt-4 text-[#f5f3ef]/65 text-xs" style="--d: 0.2s">
+          The same window, in whichever appearance your Mac is already set to. Nothing to toggle.
+        </p>
+      </div>
+    </section>
+
+    {/* 3 - What lands in the file. Icon list, two columns, no card boxes. */}
     <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5.5rem)]">
       <div class={container}>
         <h2
@@ -100,7 +150,7 @@ const linkClass =
       </div>
     </section>
 
-    {/* 3 - The privacy claim, stated once and plainly. */}
+    {/* 4 - The privacy claim, stated once and plainly. */}
     <section class="py-[clamp(4rem,9vw,6.5rem)]">
       <div class={container}>
         <div class="rise max-w-[64ch] border-[#cba980] border-l-2 pl-6 sm:pl-9">
@@ -119,7 +169,7 @@ const linkClass =
       </div>
     </section>
 
-    {/* 4 - Three steps, hairline columns, no step numbers and no card boxes. */}
+    {/* 5 - Three steps, hairline columns, no step numbers and no card boxes. */}
     <section
       id="how"
       class="scroll-mt-20 border-[#93735a]/25 border-t py-[clamp(3.5rem,8vw,5.5rem)]"
@@ -156,7 +206,7 @@ const linkClass =
       </div>
     </section>
 
-    {/* 5 - The open-source-but-paid question. Prose left, the receipts right:
+    {/* 6 - The open-source-but-paid question. Prose left, the receipts right:
            the actual commands that build the thing you would otherwise buy. */}
     <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5.5rem)]">
       <div class={container}>
@@ -191,7 +241,7 @@ cargo build --release -p msg2pdf</code></pre>
       </div>
     </section>
 
-    {/* 6 - Price and the purchase terms in one place. */}
+    {/* 7 - Price and the purchase terms in one place. */}
     <section class="border-[#93735a]/25 border-t py-[clamp(4rem,9vw,6rem)]">
       <div class={container}>
         <div class="mx-auto max-w-[52ch] text-center">
@@ -217,7 +267,7 @@ cargo build --release -p msg2pdf</code></pre>
       </div>
     </section>
 
-    {/* 7 - The four questions people actually ask, expandable. */}
+    {/* 8 - The four questions people actually ask, expandable. */}
     <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5rem)]">
       <div class={container}>
         <div class="mx-auto max-w-[70ch]">
