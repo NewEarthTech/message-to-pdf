@@ -64,16 +64,20 @@ export function ExportPanel({ conversation }: { conversation: Conversation }) {
   return (
     <div className="flex h-full flex-col overflow-y-auto p-6">
       <div>
-        <p className="text-neutral-500 text-xs uppercase tracking-wide">Export</p>
+        <p className="text-neutral-500 text-xs uppercase tracking-wide dark:text-neutral-400">
+          Export
+        </p>
         <h2 className="mt-1 font-semibold text-xl">{conversation.name}</h2>
         {conversation.name !== conversation.handle && (
-          <p className="text-neutral-500 text-sm">{conversation.handle}</p>
+          <p className="text-neutral-500 text-sm dark:text-neutral-400">{conversation.handle}</p>
         )}
       </div>
 
       <div className="mt-6 space-y-5">
         <div>
-          <span className="font-medium text-neutral-700 text-sm">Date range</span>
+          <span className="font-medium text-neutral-700 text-sm dark:text-neutral-300">
+            Date range
+          </span>
           <div className="mt-1 flex items-center gap-2">
             <input
               type="date"
@@ -81,33 +85,40 @@ export function ExportPanel({ conversation }: { conversation: Conversation }) {
               max={end || undefined}
               onChange={(e) => setStart(e.target.value)}
               disabled={exporting}
-              className="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+              className="rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800"
             />
-            <span className="text-neutral-400">→</span>
+            <span className="text-neutral-400 dark:text-neutral-500">→</span>
             <input
               type="date"
               value={end}
               min={start || undefined}
               onChange={(e) => setEnd(e.target.value)}
               disabled={exporting}
-              className="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+              className="rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800"
             />
           </div>
-          <p className="mt-1 text-neutral-400 text-xs">Leave empty to export the full history.</p>
+          <p className="mt-1 text-neutral-400 text-xs dark:text-neutral-500">
+            Leave empty to export the full history.
+          </p>
         </div>
 
         <div>
-          <span className="font-medium text-neutral-700 text-sm">Destination</span>
+          <span className="font-medium text-neutral-700 text-sm dark:text-neutral-300">
+            Destination
+          </span>
           <div className="mt-1 flex items-center gap-2">
             <button
               type="button"
               onClick={chooseFolder}
               disabled={exporting}
-              className="shrink-0 rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-50"
+              className="shrink-0 rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
             >
               Choose folder…
             </button>
-            <span className="truncate text-neutral-500 text-sm" title={outDir ?? undefined}>
+            <span
+              className="truncate text-neutral-500 text-sm dark:text-neutral-400"
+              title={outDir ?? undefined}
+            >
               {outDir ?? "No folder selected"}
             </span>
           </div>
@@ -117,7 +128,7 @@ export function ExportPanel({ conversation }: { conversation: Conversation }) {
           type="button"
           onClick={runExport}
           disabled={!outDir || exporting}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
+          className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-neutral-300 dark:disabled:bg-neutral-700"
         >
           {exporting ? "Exporting…" : "Export to PDF"}
         </button>
@@ -129,9 +140,9 @@ export function ExportPanel({ conversation }: { conversation: Conversation }) {
           <SuccessView result={state.result} onDone={() => setState({ status: "idle" })} />
         )}
         {state.status === "error" && (
-          <div className="rounded-md bg-red-50 p-3">
-            <p className="font-medium text-red-700 text-sm">Export failed</p>
-            <p className="mt-1 text-red-600 text-sm">{state.message}</p>
+          <div className="rounded-md bg-red-50 p-3 dark:bg-red-950">
+            <p className="font-medium text-red-700 text-sm dark:text-red-400">Export failed</p>
+            <p className="mt-1 text-red-600 text-sm dark:text-red-400">{state.message}</p>
           </div>
         )}
       </div>
@@ -143,43 +154,45 @@ function ProgressView({ progress }: { progress: ProgressEvent | null }) {
   const pct = progress?.fraction != null ? Math.round(progress.fraction * 100) : null
   return (
     <div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
         <div
           className={`h-full bg-blue-600 transition-all ${pct == null ? "w-full animate-pulse" : ""}`}
           style={pct != null ? { width: `${pct}%` } : undefined}
         />
       </div>
-      <p className="mt-2 text-neutral-500 text-sm">{progress?.label ?? "Starting…"}</p>
+      <p className="mt-2 text-neutral-500 text-sm dark:text-neutral-400">
+        {progress?.label ?? "Starting…"}
+      </p>
     </div>
   )
 }
 
 function SuccessView({ result, onDone }: { result: ExportResult; onDone: () => void }) {
   return (
-    <div className="rounded-md bg-green-50 p-4">
-      <p className="font-medium text-green-800 text-sm">Exported</p>
-      <p className="mt-1 truncate text-green-700 text-xs" title={result.path}>
+    <div className="rounded-md bg-green-50 p-4 dark:bg-green-950">
+      <p className="font-medium text-green-800 text-sm dark:text-green-400">Exported</p>
+      <p className="mt-1 truncate text-green-700 text-xs dark:text-green-400" title={result.path}>
         {result.path}
       </p>
       <div className="mt-3 flex gap-2">
         <button
           type="button"
           onClick={() => void openPath(result.path)}
-          className="rounded-md bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-neutral-50"
+          className="rounded-md bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700"
         >
           Open PDF
         </button>
         <button
           type="button"
           onClick={() => void revealItemInDir(result.path)}
-          className="rounded-md bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-neutral-50"
+          className="rounded-md bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700"
         >
           Reveal in Finder
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="ml-auto rounded-md px-3 py-1.5 text-neutral-500 text-sm hover:bg-neutral-100"
+          className="ml-auto rounded-md px-3 py-1.5 text-neutral-500 text-sm hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
         >
           Done
         </button>

@@ -52,14 +52,14 @@ function App() {
   }, [check])
 
   return (
-    <div className="flex h-screen flex-col bg-neutral-50 text-neutral-900">
-      <header className="flex items-baseline gap-3 border-neutral-200 border-b px-6 py-3">
+    <div className="flex h-screen flex-col bg-neutral-50 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
+      <header className="flex items-baseline gap-3 border-neutral-200 border-b px-6 py-3 dark:border-neutral-800">
         <h1 className="font-semibold text-lg">{PRODUCT_NAME}</h1>
-        <p className="text-neutral-500 text-sm">{PRODUCT_TAGLINE}</p>
+        <p className="text-neutral-500 text-sm dark:text-neutral-400">{PRODUCT_TAGLINE}</p>
         <button
           type="button"
           onClick={() => setAboutOpen(true)}
-          className="ml-auto self-center rounded-md px-2.5 py-1 text-neutral-500 text-sm hover:bg-neutral-100 hover:text-neutral-700"
+          className="ml-auto self-center rounded-md px-2.5 py-1 text-neutral-500 text-sm hover:bg-neutral-100 hover:text-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
         >
           About
         </button>
@@ -68,11 +68,11 @@ function App() {
       {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} />}
 
       {phase.kind === "checking" && (
-        <p className="p-6 text-neutral-500 text-sm">Checking access…</p>
+        <p className="p-6 text-neutral-500 text-sm dark:text-neutral-400">Checking access…</p>
       )}
 
       {phase.kind === "loading" && (
-        <p className="p-6 text-neutral-500 text-sm">Loading conversations…</p>
+        <p className="p-6 text-neutral-500 text-sm dark:text-neutral-400">Loading conversations…</p>
       )}
 
       {phase.kind === "blocked" && (
@@ -81,14 +81,16 @@ function App() {
 
       {phase.kind === "error" && (
         <div className="p-6">
-          <p className="font-medium text-red-700 text-sm">Could not read conversations</p>
-          <p className="mt-1 text-neutral-500 text-sm">{phase.message}</p>
+          <p className="font-medium text-red-700 text-sm dark:text-red-400">
+            Could not read conversations
+          </p>
+          <p className="mt-1 text-neutral-500 text-sm dark:text-neutral-400">{phase.message}</p>
         </div>
       )}
 
       {phase.kind === "ready" && (
         <div className="flex min-h-0 flex-1">
-          <aside className="w-80 shrink-0 border-neutral-200 border-r">
+          <aside className="w-80 shrink-0 border-neutral-200 border-r dark:border-neutral-800">
             <ConversationList
               conversations={phase.conversations}
               selected={selected}
@@ -99,7 +101,7 @@ function App() {
             {selected ? (
               <ExportPanel key={selected.rowid} conversation={selected} />
             ) : (
-              <div className="flex h-full items-center justify-center p-6 text-center text-neutral-400 text-sm">
+              <div className="flex h-full items-center justify-center p-6 text-center text-neutral-400 text-sm dark:text-neutral-500">
                 Select a conversation to export.
               </div>
             )}

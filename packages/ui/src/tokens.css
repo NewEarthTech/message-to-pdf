@@ -3,8 +3,9 @@
    dark base, a single gold accent, no second accent anywhere.
 
    Deliberately NOT imported by the desktop app: that app is a native-feeling
-   macOS utility in the system light appearance, and it should look like the
-   platform rather than like the brand page. This file is for web surfaces.
+   macOS utility that follows the system light/dark appearance, and it should
+   look like the platform rather than like the brand page. This file is for
+   web surfaces.
 
    Contrast floor: muted body text must stay at or above 65% opacity of
    --color-ink. At 45% it computes to 3.49:1 against --color-base, under the
