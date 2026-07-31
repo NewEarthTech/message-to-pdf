@@ -49,3 +49,13 @@ resource "aws_route53_record" "www_aaaa" {
     evaluate_target_health = false
   }
 }
+
+resource "aws_route53_record" "apex_txt" {
+  zone_id = data.aws_route53_zone.site.zone_id
+  name = var.domain_name
+  type = "TXT"
+  ttl = 300
+  records = [
+    "google-site-verification=i9rj_-kMnLwxCd-uOW5ccJFoFgdH6xIazC0CpSb80xU"
+  ]
+}
