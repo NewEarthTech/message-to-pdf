@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/NewEarthTech/message-to-pdf/compare/v1.0.1...v1.1.0) (2026-07-31)
+
+
+### Features
+
+* **desktop:** follow system light/dark appearance ([#63](https://github.com/NewEarthTech/message-to-pdf/issues/63)) ([df2c83b](https://github.com/NewEarthTech/message-to-pdf/commit/df2c83b3bd739b835436c28057b4a3297e6c49bb))
+
 ## [1.0.1](https://github.com/NewEarthTech/message-to-pdf/compare/v1.0.0...v1.0.1) (2026-07-28)
 
 
