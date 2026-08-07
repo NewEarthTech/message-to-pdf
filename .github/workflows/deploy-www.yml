@@ -85,7 +85,11 @@ jobs:
       - name: Smoke test the live site
         run: |
           set -euo pipefail
-          for path in / /pricing /faq /terms /privacy /refund /sitemap-index.xml /robots.txt; do
+          for path in / /pricing /faq /terms /privacy /refund \
+              /export-text-messages-for-court \
+              /save-text-messages-from-a-deceased-loved-one \
+              /print-imessages-to-pdf \
+              /sitemap-index.xml /robots.txt; do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "https://message-to-pdf.com$path")
             echo "$path -> $code"
             [ "$code" = "200" ] || { echo "expected 200 for $path"; exit 1; }

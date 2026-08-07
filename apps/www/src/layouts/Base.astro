@@ -8,11 +8,15 @@ interface Props {
   title: string
   description: string
   noindex?: boolean
-  /** Emitted as application/ld+json. */
-  jsonLd?: object
+  /** Emitted as application/ld+json. One node, or several for a page that
+   * describes more than one thing (a guide is a WebPage, a breadcrumb trail and
+   * a set of questions at the same time). */
+  jsonLd?: object | object[]
 }
 
 const { title, description, noindex = false, jsonLd } = Astro.props
+
+const jsonLdNodes = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
 
 // Canonical is derived from the route so it can never drift from where the page
 // actually lives. trailingSlash is "never", so Astro.url.pathname is already the
@@ -50,7 +54,11 @@ const ogImage = new URL("/og.png", Astro.site).href
     <meta name="theme-color" content="#3A3A38" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {
+      jsonLdNodes.map((node) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(node)} />
+      ))
+    }
   </head>
   <body>
     <Header />

@@ -1,0 +1,135 @@
+---
+import { SOURCE_URL, SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+import Guide from "@/layouts/Guide.astro"
+import type { QuestionAnswer } from "@/lib/schema"
+
+const path = "/export-text-messages-for-court"
+
+// Rendered on the page and emitted as FAQPage data from the same array, so the
+// two can never say different things.
+const faqs: QuestionAnswer[] = [
+  {
+    q: "Will a court accept a PDF of my text messages?",
+    a: "That is up to the court, the rules of evidence where your case is heard, and usually opposing counsel, so ask your attorney rather than us. What Message to PDF gives you is a complete, unedited copy of one conversation as it exists in Messages on your Mac, laid out in order with its dates and timestamps."
+  },
+  {
+    q: "Does it recover deleted messages?",
+    a: "No. It exports what is in the Messages database on your Mac. If a message was deleted from Messages, it is not there to export. Recovering deleted data is a job for a forensic examiner with the device in hand."
+  },
+  {
+    q: "Can I export a group chat?",
+    a: "Not yet. Message to PDF exports one-on-one conversations, iMessage and SMS both. Group chats are on the list but are not supported today."
+  },
+  {
+    q: "Can I export only the dates that matter to the case?",
+    a: "Yes. You can set a start and end date and export just that window, or export the whole history. Both are one export."
+  },
+  {
+    q: "Do you see the conversation?",
+    a: "No. The app runs on your Mac, reads the database on your Mac, and writes the PDF to a folder you pick. It has no account and makes no network calls of its own, so nothing about the conversation reaches us or anyone else. That matters when the messages are privileged or sensitive."
+  },
+  {
+    q: "Does exporting change anything in Messages?",
+    a: "No. The app opens the Messages database read-only and writes nothing back to it. The only file it creates is the PDF you asked for."
+  }
+]
+---
+
+<Guide
+  path={path}
+  crumb="Text messages for court"
+  title="Export text messages for court"
+  description="Turn an iMessage or SMS conversation into one paginated, printable PDF on your Mac, with dates, timestamps and both sides intact. Nothing is uploaded. $29 once."
+  h1="Export text messages for court"
+  faqs={faqs}
+>
+  <p>
+    Divorce, custody, harassment, a landlord dispute: at some point somebody asks you to produce the
+    texts. A folder of two hundred screenshots is the usual answer, and it is a bad one. Screenshots
+    arrive out of order, drop the dates between them, cannot be searched, and give the other side an
+    easy argument about what was left out.
+  </p>
+  <p>
+    Message to PDF turns one conversation into a single PDF on your Mac. Every message in order,
+    with the dates and timestamps Messages recorded, both sides of the thread, and the photos in the
+    place they were sent.
+  </p>
+
+  <h2>What ends up in the file</h2>
+  <ul>
+    <li>Every message in the thread, in order, sent and received.</li>
+    <li>Date separators and the timestamps Messages recorded, including read receipts where it has them.</li>
+    <li>The contact name as it appears on your Mac, and the phone number or address behind it.</li>
+    <li>Photos and image attachments placed inline, in the message they arrived with.</li>
+    <li>Tapbacks, attached to the message they were a reaction to.</li>
+    <li>iMessage and SMS both, the blue and the green.</li>
+  </ul>
+  <p>
+    The result is an ordinary US Letter PDF with searchable text. Whatever your firm already uses to
+    Bates stamp, redact, combine or e-file exhibits will open it like any other document, and it
+    prints the way it looks.
+  </p>
+
+  <h2>It does not touch your Messages database</h2>
+  <p>
+    The app opens the Messages database read-only. It writes exactly one thing, the PDF, into the
+    folder you choose. Nothing is uploaded, there is no account, and the app makes no network calls
+    of its own, so a privileged conversation stays on the machine it was already on. You do not have
+    to take that on faith either: Message to PDF is free software under GPL-3.0-or-later, and the{" "}
+    <a href={SOURCE_URL} rel="noreferrer" target="_blank">source is public</a>.
+  </p>
+
+  <h2>What this is not</h2>
+  <p>
+    It is worth being plain about this, because the category is full of overstatement. Message to
+    PDF is an exporter, not forensic acquisition software. It does not image a device, compute
+    verification hashes, recover deleted messages, or produce an affidavit, a chain of custody
+    record or expert testimony. If your matter needs a certified forensic collection, hire a
+    forensic examiner and have them do it properly.
+  </p>
+  <p>
+    Nothing on this page is legal advice, and we make no claim about whether any particular export
+    will be admitted anywhere. Your attorney decides what to produce and how.
+  </p>
+
+  <h2>Before you export</h2>
+  <ul>
+    <li>
+      <strong>Check the history is actually on the Mac.</strong> The app reads the Messages database
+      on the computer it runs on. If the thread lives on your iPhone and your Mac is signed into the
+      same Apple Account with Messages in iCloud turned on, it will be there too. Open Messages on
+      the Mac first and scroll back to confirm what you expect to see.
+    </li>
+    <li>
+      <strong>Prefer the whole thread over an excerpt.</strong> A date range is there when you need
+      it, but a complete conversation is harder to argue with than a slice of one.
+    </li>
+    <li>
+      <strong>Export before anything changes.</strong> Messages can be deleted, and devices get
+      replaced. The PDF is a file you keep.
+    </li>
+    <li>
+      <strong>Long threads are fine.</strong> The largest real conversation we have tested held just
+      over one hundred thousand messages and exported in about half a minute.
+    </li>
+  </ul>
+
+  <h2>Three steps</h2>
+  <h3>1. Grant Full Disk Access</h3>
+  <p>
+    macOS keeps the Messages database private, even from you. The app walks you through the one
+    switch in System Settings that lets it read the database on your own machine.
+  </p>
+  <h3>2. Pick the conversation and the dates</h3>
+  <p>Choose the thread by name or number, and set a date range if you only want part of it.</p>
+  <h3>3. Export</h3>
+  <p>
+    Pick a destination folder. The PDF is written there, page breaks handled, ready to send to your
+    attorney.
+  </p>
+  <p>
+    Questions before you buy, or something you need to know about a specific case file? Email{" "}
+    <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> and a person answers.
+  </p>
+</Guide>

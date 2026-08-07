@@ -8,8 +8,9 @@ import appDark from "@/assets/app-dark.png"
 import appLight from "@/assets/app-light.png"
 import ContentsGrid from "@/components/react/ContentsGrid"
 import { FAQ_ITEMS } from "@/data/faq"
+import { GUIDES } from "@/data/guides"
 import Base from "@/layouts/Base.astro"
-import { softwareApplication } from "@/lib/schema"
+import { faqPage, organization, softwareApplication } from "@/lib/schema"
 
 // Shape system for the whole site: surfaces are 16px (rounded-2xl), anything
 // interactive is a full pill. Nothing else gets a radius.
@@ -27,7 +28,7 @@ const linkClass =
 <Base
   title="iMessage to PDF for Mac | Message to PDF"
   description="Message to PDF turns your iMessage and SMS history into a clean, printable PDF, entirely on your Mac. Nothing gets uploaded. $29, one time."
-  jsonLd={softwareApplication()}
+  jsonLd={[softwareApplication(), organization(), faqPage(homeFaqs)]}
 >
   <main>
     {/* 1 - Hero: asymmetric split, copy left, the actual product output right. */}
@@ -160,7 +161,7 @@ const linkClass =
             Your messages are read on your Mac, written to a file on your Mac, and go nowhere else.
             There is no account, no sync, no server. The app makes no network calls of its own.
           </p>
-          <p class="mt-5 text-[#f5f3ef]/60">
+          <p class="mt-5 text-[#f5f3ef]/65">
             You do not have to believe that. It is free software, so the code is public and you can
             read exactly what it does, or build it yourself.{" "}
             <a class={linkClass} href={SOURCE_URL} target="_blank" rel="noreferrer">Read the source</a>.
@@ -206,7 +207,39 @@ const linkClass =
       </div>
     </section>
 
-    {/* 6 - The open-source-but-paid question. Prose left, the receipts right:
+    {/* 6 - Why people came looking. Each row is the entry point to a page that
+           answers that situation properly. */}
+    <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5.5rem)]">
+      <div class={container}>
+        <h2
+          class="rise max-w-[26ch] font-[660] text-[clamp(1.7rem,3.4vw,2.3rem)] tracking-[-0.025em]"
+        >
+          What people need it for.
+        </h2>
+        <p class="rise mt-4 max-w-[58ch] text-[#f5f3ef]/70" style="--d: 0.06s">
+          Almost everyone arrives with one of these in mind. Each one has its own page, including
+          the parts the app cannot help with.
+        </p>
+        <div class="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-x-10">
+          {
+            GUIDES.map((guide, i) => (
+              <a
+                class="group rise border-[#93735a]/45 border-t pt-5"
+                href={guide.path}
+                style={`--d: ${0.06 * (i + 2)}s`}
+              >
+                <h3 class="font-[620] text-[#cba980] text-[1.05rem] transition-colors group-hover:text-[#f5f3ef]">
+                  {guide.title}
+                </h3>
+                <p class="mt-2.5 text-[#f5f3ef]/70 text-[0.96rem] leading-[1.55]">{guide.blurb}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    {/* 7 - The open-source-but-paid question. Prose left, the receipts right:
            the actual commands that build the thing you would otherwise buy. */}
     <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5.5rem)]">
       <div class={container}>
@@ -241,7 +274,7 @@ cargo build --release -p msg2pdf</code></pre>
       </div>
     </section>
 
-    {/* 7 - Price and the purchase terms in one place. */}
+    {/* 8 - Price and the purchase terms in one place. */}
     <section class="border-[#93735a]/25 border-t py-[clamp(4rem,9vw,6rem)]">
       <div class={container}>
         <div class="mx-auto max-w-[52ch] text-center">
@@ -267,7 +300,7 @@ cargo build --release -p msg2pdf</code></pre>
       </div>
     </section>
 
-    {/* 8 - The four questions people actually ask, expandable. */}
+    {/* 9 - The four questions people actually ask, expandable. */}
     <section class="border-[#93735a]/25 border-t bg-[#2d2d2b] py-[clamp(3.5rem,8vw,5rem)]">
       <div class={container}>
         <div class="mx-auto max-w-[70ch]">

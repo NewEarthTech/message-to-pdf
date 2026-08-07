@@ -1,6 +1,8 @@
 ---
 import { SELLER_LEGAL, SELLER_NAME, SOURCE_URL, SUPPORT_EMAIL } from "@msg2pdf/ui"
 
+import { GUIDES } from "@/data/guides"
+
 // Seller identity lives here in full. A payment processor reviewing this site
 // looks for exactly this: who is selling, under what legal entity, how to reach
 // them, and where the policies are.
@@ -14,6 +16,16 @@ const year = new Date().getFullYear()
         <p class="font-medium text-[#f5f3ef]/80">Message to PDF</p>
         <p>Sold by {SELLER_LEGAL}. Payments are processed by Paddle as Merchant of Record.</p>
       </div>
+      <nav class="flex flex-col gap-2.5">
+        <p class="font-medium text-[#f5f3ef]/80">Common uses</p>
+        {
+          GUIDES.map((guide) => (
+            <a class="transition-colors hover:text-[#f5f3ef]" href={guide.path}>
+              {guide.nav}
+            </a>
+          ))
+        }
+      </nav>
       <nav class="flex flex-col gap-2.5 sm:text-right">
         <a class="transition-colors hover:text-[#f5f3ef]" href="/pricing">Pricing</a>
         <a class="transition-colors hover:text-[#f5f3ef]" href="/faq">FAQ</a>

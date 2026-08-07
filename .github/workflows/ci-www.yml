@@ -70,9 +70,21 @@ jobs:
           grep -q "Turn your iMessage history into a PDF worth keeping." dist/index.html
           grep -q "Frequently asked questions" dist/faq/index.html
           grep -q "Privacy and permissions" dist/faq/index.html
+          grep -q "Export text messages for court" dist/export-text-messages-for-court/index.html
+          grep -q "someone you have lost" dist/save-text-messages-from-a-deceased-loved-one/index.html
+          grep -q "Print iMessages to PDF" dist/print-imessages-to-pdf/index.html
+          # Each use-case page must carry its own structured data and be reachable
+          # from the home page, which is the whole point of building them.
+          for page in export-text-messages-for-court save-text-messages-from-a-deceased-loved-one print-imessages-to-pdf; do
+            grep -q '"@type":"BreadcrumbList"' "dist/$page/index.html"
+            grep -q "href=\"/$page\"" dist/index.html
+          done
           test -s dist/sitemap-index.xml
           test -s dist/robots.txt
-          for page in index.html faq/index.html terms/index.html privacy/index.html refund/index.html; do
+          for page in index.html faq/index.html terms/index.html privacy/index.html refund/index.html \
+              export-text-messages-for-court/index.html \
+              save-text-messages-from-a-deceased-loved-one/index.html \
+              print-imessages-to-pdf/index.html; do
             if grep -q '_astro/.*\.js' "dist/$page"; then
               echo "$page unexpectedly ships JavaScript; only /pricing and /success should"
               exit 1
