@@ -1,0 +1,120 @@
+---
+import { SUPPORT_EMAIL } from "@msg2pdf/ui"
+
+import Guide from "@/layouts/Guide.astro"
+import type { QuestionAnswer } from "@/lib/schema"
+
+const path = "/save-text-messages-from-a-deceased-loved-one"
+
+const faqs: QuestionAnswer[] = [
+  {
+    q: "Can it get the messages off their iPhone?",
+    a: "No. Message to PDF reads the Messages database on the Mac it is running on. It cannot unlock a phone, and it cannot sign into an account for you. If the conversation you want is already in Messages on a Mac you can use, it can export it today."
+  },
+  {
+    q: "Do I need their Apple Account?",
+    a: "Not for your own side of the conversation. The thread you had with them is on your Mac in full, both halves of it, if Messages on that Mac has the history. You would only need access to their account for conversations they had with someone else."
+  },
+  {
+    q: "What happens to photos and videos they sent?",
+    a: "Photos and image attachments are placed in the page where they were sent. Videos and voice messages cannot play inside a PDF, so those messages appear in the thread without the media itself. The files stay where they already are on your Mac."
+  },
+  {
+    q: "How far back can it go?",
+    a: "As far back as Messages on that Mac still holds. You can export the entire history or narrow it to a date range. The largest conversation we have tested held just over one hundred thousand messages and exported in about half a minute."
+  },
+  {
+    q: "Can I export more than one conversation?",
+    a: "Yes. You buy the app once and export as many conversations as you like, one at a time. There is no license key, no activation and no per-export charge."
+  },
+  {
+    q: "Does anything get uploaded?",
+    a: "No. The app runs entirely on your Mac, has no account, and makes no network calls of its own. The messages are read on your computer and the PDF is written to your computer. Nobody else sees any of it."
+  }
+]
+---
+
+<Guide
+  path={path}
+  crumb="Messages from a loved one"
+  title="Save text messages from a loved one who has died"
+  description="Export the conversation you had with someone you have lost into a PDF you can keep, print and share with family. It runs on your Mac and uploads nothing. $29 once."
+  h1="Save the text messages from someone you have lost"
+  faqs={faqs}
+>
+  <p>
+    When someone dies, their messages are often the last thing left that still sounds like them. The
+    turns of phrase, the running jokes, what they wrote on an ordinary Tuesday. And all of it lives
+    inside an app, tied to a phone and an account, in a form you cannot hold or hand to anyone.
+  </p>
+  <p>
+    Message to PDF takes one conversation and writes it to a PDF on your Mac. A file. Something you
+    can back up, print, put on a drive in a drawer, and send to their sister without asking anyone's
+    permission.
+  </p>
+
+  <h2>What it can reach, and what it cannot</h2>
+  <p>
+    This part matters more than anything else on the page, so it comes first.
+  </p>
+  <ul>
+    <li>
+      <strong>The conversation you had with them is already yours.</strong> Your Mac holds both
+      sides of it, everything they sent you and everything you sent back, as long as Messages on
+      that Mac has the history. That is the case Message to PDF handles, and it handles it today.
+    </li>
+    <li>
+      <strong>It cannot get into their phone.</strong> The app reads the Messages database on the
+      computer it runs on. It cannot unlock an iPhone, bypass a passcode, or sign into an account
+      for you. If the only copy of what you want is on their locked device, this is not the tool for
+      that, and we would rather say so than take your money.
+    </li>
+    <li>
+      <strong>Their Mac counts.</strong> If you have their Mac and can sign into it, the app can
+      export the conversations in Messages there the same way.
+    </li>
+  </ul>
+  <p>
+    If you are trying to reach an account you do not have access to, Apple runs a Digital Legacy
+    process for requesting access to a deceased person's Apple Account, and their support site
+    documents what it requires. Whether the messages themselves come back that way depends on how
+    the account was set up, so treat it as worth trying rather than a guarantee.
+  </p>
+
+  <h2>Why a PDF rather than screenshots</h2>
+  <p>
+    Screenshots come out as hundreds of image files in whatever order your phone felt like, with the
+    dates cut off and nothing searchable. A PDF is one document. It opens on any computer, on any
+    operating system, without an account and without this app, now and in twenty years. You can
+    print it and bind it. You can hand a copy to their parents. You can put it in the same place you
+    keep the photographs.
+  </p>
+
+  <h2>What the file looks like</h2>
+  <p>
+    It reads the way the thread read on your phone: message bubbles in order, blue and green,
+    photos placed where they were sent, date separators between one day and the next, timestamps and
+    read receipts where Messages recorded them, and tapbacks still attached to the message they were
+    a reaction to. Not a spreadsheet of rows. The conversation.
+  </p>
+
+  <h2>You do not have to read it today</h2>
+  <p>
+    You can export the thread and not open it for a year. That is a complete and sensible thing to
+    do. Getting it out of the app and into a file you control is the part with any urgency to it, in
+    the sense that phones get replaced and accounts get closed. Reading it is not.
+  </p>
+
+  <h2>It stays private</h2>
+  <p>
+    The app runs on your Mac and nowhere else. No account, no sync, no server, no analytics, and no
+    network calls of its own, so nothing you export is ever seen by us. It is also free software
+    under GPL-3.0-or-later, which means anyone can read the code and confirm that.
+  </p>
+  <p>
+    If you are not sure whether your situation is the one this handles, email{" "}
+    <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> before you buy anything and describe it.
+    A person will answer, and if the answer is that this will not help you, that is what you will
+    get.
+  </p>
+</Guide>

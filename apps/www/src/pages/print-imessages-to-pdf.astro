@@ -1,0 +1,126 @@
+---
+import { SOURCE_URL } from "@msg2pdf/ui"
+
+import Guide from "@/layouts/Guide.astro"
+import type { QuestionAnswer } from "@/lib/schema"
+
+const path = "/print-imessages-to-pdf"
+
+const faqs: QuestionAnswer[] = [
+  {
+    q: "Can I export an iMessage conversation from Messages itself?",
+    a: "Messages has no export command that produces a file of the whole conversation. You can select text and copy it, which loses the photos, the timestamps and the layout, or print what the window has loaded, which means scrolling a long thread all the way back first. Message to PDF reads the conversation from the Messages database directly, so length does not change the procedure."
+  },
+  {
+    q: "Can I print text messages that are on my iPhone?",
+    a: "Only by way of a Mac. If your Mac is signed into the same Apple Account with Messages in iCloud turned on, the conversations on your iPhone are in Messages on the Mac too, and Message to PDF exports them from there. There is no iPhone app to install."
+  },
+  {
+    q: "Does it work with SMS, the green bubbles?",
+    a: "Yes. iMessage and SMS both, in the same PDF, in the colors you already know."
+  },
+  {
+    q: "Is the text in the PDF searchable?",
+    a: "Yes. The messages are real text on the page, not pictures of text, so you can search the PDF, select from it and copy out of it. It is US Letter and prints as it looks."
+  },
+  {
+    q: "Why does it need Full Disk Access?",
+    a: "macOS treats the Messages database as private, even from you, and Full Disk Access is the switch Apple provides to grant an app permission to read it. The app uses it for nothing else, and you can revoke it in System Settings whenever you like."
+  },
+  {
+    q: "How big can a conversation be?",
+    a: "The largest real conversation we have tested held just over one hundred thousand messages, and it exported in about half a minute. Years of daily texting is a normal case, not a hard one."
+  }
+]
+---
+
+<Guide
+  path={path}
+  crumb="Print iMessages to PDF"
+  title="Print iMessages to PDF on a Mac"
+  description="How to turn an iMessage or SMS conversation into a searchable, printable PDF on macOS, with photos, timestamps and tapbacks in place. $29 once, nothing uploaded."
+  h1="Print iMessages to PDF"
+  faqs={faqs}
+>
+  <p>
+    Messages will show you years of conversation and give you no way to take it with you. There is
+    no export command, no save as, nothing that hands you a file. So people screenshot, and then
+    they have four hundred images with no dates on them.
+  </p>
+  <p>
+    Message to PDF is a small macOS app that reads one conversation out of your Messages database
+    and writes it to a PDF: every message in order, photos inline, timestamps, read receipts and
+    tapbacks intact.
+  </p>
+
+  <h2>What people usually try first</h2>
+  <ul>
+    <li>
+      <strong>Screenshots.</strong> Fast for five messages, unusable for five thousand. They arrive
+      as a pile of images, out of order, with the dates between them missing and no way to search.
+    </li>
+    <li>
+      <strong>Copy and paste into a document.</strong> The text comes across. The photos, the
+      timestamps, the who said what and the reading order mostly do not.
+    </li>
+    <li>
+      <strong>Printing from Messages.</strong> macOS can print to PDF from almost any app, but what
+      you get is a print of the window and only of the part it has loaded, so a long thread has to be
+      scrolled all the way back first and the result is not laid out to be read as a document.
+    </li>
+  </ul>
+  <p>
+    The reason these are all awkward is the same in each case: the conversation lives in a database,
+    and none of them read it. That is the part Message to PDF does.
+  </p>
+
+  <h2>How to save an iMessage conversation as a PDF</h2>
+  <h3>1. Get the conversation onto a Mac</h3>
+  <p>
+    The app reads the Messages database on the Mac it runs on. If the thread is on your iPhone, sign
+    the Mac into the same Apple Account and turn on Messages in iCloud, then open Messages on the
+    Mac and check the history is there.
+  </p>
+  <h3>2. Grant Full Disk Access</h3>
+  <p>
+    macOS keeps the Messages database private, even from you. The app explains the one switch in
+    System Settings and links you straight to it.
+  </p>
+  <h3>3. Pick the conversation, and a date range if you want one</h3>
+  <p>
+    Choose a one-on-one thread by name or number. Export the whole history, or set a start and end
+    date and take only that window.
+  </p>
+  <h3>4. Export</h3>
+  <p>
+    Choose a destination folder and the PDF is written there, with the page breaks worked out so no
+    message lands half off the edge.
+  </p>
+
+  <h2>What ends up in the PDF</h2>
+  <ul>
+    <li>Message bubbles in reading order, sent and received, iMessage blue and SMS green.</li>
+    <li>Photos and image attachments placed in the page where they were sent.</li>
+    <li>Date separators, timestamps, and read receipts where Messages recorded them.</li>
+    <li>Tapbacks attached to the message they were a reaction to.</li>
+    <li>Searchable text on US Letter pages, so it prints, archives and opens anywhere.</li>
+  </ul>
+
+  <h2>What it does not do yet</h2>
+  <p>
+    One-on-one conversations only. Group chats are on the list but are not supported today. It does
+    not recover deleted messages, and it does not read anything that is not already in Messages on
+    the Mac. Videos and voice messages cannot play inside a PDF, so those messages appear in the
+    thread without the media itself.
+  </p>
+
+  <h2>It runs on your Mac and nowhere else</h2>
+  <p>
+    No account, no sync, no server, no analytics. The app makes no network calls of its own, and the
+    Messages database is opened read-only, so exporting changes nothing. It is free software under
+    GPL-3.0-or-later, so if you would rather check that than take our word for it, the{" "}
+    <a href={SOURCE_URL} rel="noreferrer" target="_blank">source is public</a> and you can build it
+    yourself. The $29 buys the finished build, signed and notarized by Apple so it opens with a
+    double click.
+  </p>
+</Guide>

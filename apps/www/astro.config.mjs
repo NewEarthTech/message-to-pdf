@@ -29,7 +29,31 @@ export default defineConfig({
   // and the CloudFront function maps those onto each route's index.html.
   trailingSlash: "never",
   build: { format: "directory" },
-  integrations: [react(), sitemap({ filter: (page) => !page.includes("/success") })],
+  integrations: [
+    react(),
+    sitemap({
+      // /success is a post-purchase page reached with a transaction id. It has
+      // nothing to rank for and should not be crawled, so it stays out.
+      filter: (page) => !page.includes("/success"),
+      changefreq: "monthly",
+      // Weight the pages a buyer arrives on above the ones they read after they
+      // have decided. Priority is a hint, not a ranking factor, but leaving
+      // legal boilerplate at the same weight as the home page is the wrong hint.
+      // Anything not listed is a use-case page and keeps the 0.8 default.
+      serialize: (item) => {
+        const priorities = new Map([
+          ["", 1.0],
+          ["/pricing", 0.9],
+          ["/faq", 0.7],
+          ["/terms", 0.3],
+          ["/privacy", 0.3],
+          ["/refund", 0.3]
+        ])
+        const path = new URL(item.url).pathname.replace(/\/$/, "")
+        return { ...item, priority: priorities.get(path) ?? 0.8 }
+      }
+    })
+  ],
   // Uncommon pinned port, strict so a taken port fails loudly instead of
   // silently shifting. 47611 belongs to the desktop app's dev server.
   server: { port: 47612 },
