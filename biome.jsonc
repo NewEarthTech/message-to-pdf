@@ -3,7 +3,7 @@
   // this and overrides only its own `files.includes`, so the desktop app and the
   // marketing site cannot drift on style. The Rust in this repo is deliberately
   // hand-formatted and is not covered here (clippy is its gate).
-  "$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
