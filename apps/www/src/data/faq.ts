@@ -60,7 +60,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: "Which Macs are supported?",
     group: "What it exports",
     onHome: true,
-    a: "It is a universal app: it runs natively on both Apple Silicon and Intel Macs, on macOS 11 (Big Sur) and later. It is signed and notarized by Apple, so it opens with a double click."
+    a: "It is a universal app: it runs natively on both Apple Silicon and Intel Macs, on macOS 10.15 (Catalina) and later. It is signed and notarized by Apple, so it opens with a double click."
   },
   {
     q: "Is it open source? Where is the code?",
