@@ -20,10 +20,10 @@
     "@msg2pdf/ui": "workspace:*",
     "@paddle/paddle-js": "^1.6.5",
     "@phosphor-icons/react": "^2.1.10",
-    "astro": "^7.3.3",
+    "astro": "^7.3.5",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "sharp": "^0.35.4"
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
