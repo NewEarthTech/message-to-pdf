@@ -9,7 +9,7 @@ This stack covers the website only. The purchase funnel's other pieces (the Padd
 - `aws_s3_bucket.site` — private bucket (`message-to-pdf-com-site`); all public access blocked.
 - `aws_cloudfront_origin_access_control.site` + `aws_s3_bucket_policy.site` — OAC grant, scoped to this distribution by ARN.
 - `aws_acm_certificate.site` (us-east-1) — `message-to-pdf.com` + `www.message-to-pdf.com`, DNS-validated.
-- `aws_cloudfront_function.directory_index` — rewrites extensionless paths onto `<route>/index.html`. The site is prerendered per route, so `/pricing` is a real document, not an SPA shell.
+- `aws_cloudfront_function.directory_index` — rewrites extensionless paths onto `<route>/index.html`. The site is prerendered per route, so `/pricing` is a real document, not an SPA shell. It also 301s every other spelling of a page (`www.`, a trailing slash, `/index.html`, the bare CloudFront domain) to the extensionless apex URL with its query string intact, so each page has exactly one URL.
 - `aws_cloudfront_distribution.site` — redirect-to-https, compression, managed `CachingOptimized` and `SecurityHeadersPolicy`, and 403/404 mapped to the prerendered `/404.html` **with a 404 status** (not a soft 200).
 - `aws_route53_record.*` — the live A/AAAA aliases for the apex and `www`. This zone was created for this site alone, so unlike newearth.llc the records live with the stack rather than in `my-infra-private`.
 - `aws_iam_role.deploy` — the OIDC role the deploy workflow assumes. Separate from the release-signing role by design: a website deploy can never touch a release artifact.

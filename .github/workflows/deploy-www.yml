@@ -97,3 +97,13 @@ jobs:
           code=$(curl -sS -o /dev/null -w '%{http_code}' "https://message-to-pdf.com/no-such-page")
           echo "/no-such-page -> $code"
           [ "$code" = "404" ] || { echo "expected a real 404, got $code"; exit 1; }
+          # Every other spelling of a page 301s to its one canonical URL, query
+          # string intact. The CloudFront function in infra/www/cdn.tf does this.
+          check_redirect() {
+            got=$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' "$1")
+            echo "$1 -> $got"
+            [ "$got" = "301 $2" ] || { echo "expected a 301 to $2"; exit 1; }
+          }
+          check_redirect "https://www.message-to-pdf.com/pricing?a=1" "https://message-to-pdf.com/pricing?a=1"
+          check_redirect "https://message-to-pdf.com/pricing/" "https://message-to-pdf.com/pricing"
+          check_redirect "https://message-to-pdf.com/index.html" "https://message-to-pdf.com/"
