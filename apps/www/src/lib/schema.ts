@@ -4,12 +4,15 @@ import { FAQ_ITEMS } from "@/data/faq"
 
 // Stable @id values so the nodes on different pages describe one product and
 // one company rather than a new pair per URL. Search engines and answer engines
-// both dedupe on these.
+// both dedupe on these. A reference only resolves against nodes on its own page,
+// though: nothing follows an @id to the page that defines it, so pointing at a
+// node the page does not carry leaves an object with no @type. Any page that
+// points at one of these nodes emits it too.
 const PRODUCT_ID = `${SITE_URL}/#product`
 const ORG_ID = `${SITE_URL}/#organization`
 
-// The product, described once. The home and pricing pages both emit it, so
-// describing it in two places would let the two drift.
+// The product, described once. The home, pricing and guide pages all emit it, so
+// describing it per page would let them drift.
 export function softwareApplication() {
   return {
     "@context": "https://schema.org",
@@ -35,8 +38,8 @@ export function softwareApplication() {
   }
 }
 
-// Who is behind the product. Emitted on the home page only: one authoritative
-// node, referenced by @id everywhere else.
+// Who is behind the product. Emitted alongside the product, since the product
+// names it as publisher.
 export function organization() {
   return {
     "@context": "https://schema.org",
@@ -45,7 +48,9 @@ export function organization() {
     name: SELLER_NAME,
     legalName: SELLER_LEGAL,
     url: "https://newearth.llc",
-    brand: { "@id": PRODUCT_ID }
+    // brand takes a Brand or an Organization, so it names the product rather
+    // than pointing at the SoftwareApplication node.
+    brand: { "@type": "Brand", name: "Message to PDF" }
   }
 }
 
@@ -83,7 +88,7 @@ export function breadcrumbs(path: string, name: string) {
 
 // A guide page, tied back to the product it is about. `about` is what lets an
 // answer engine connect the question the page answers to the thing that answers
-// it, without restating the product on every page.
+// it.
 export function guidePage({
   path,
   headline,

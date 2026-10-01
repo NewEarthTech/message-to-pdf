@@ -1,7 +1,14 @@
 ---
 import { guidesExcept } from "@/data/guides"
 import Base from "@/layouts/Base.astro"
-import { breadcrumbs, faqPage, guidePage, type QuestionAnswer } from "@/lib/schema"
+import {
+  breadcrumbs,
+  faqPage,
+  guidePage,
+  organization,
+  type QuestionAnswer,
+  softwareApplication
+} from "@/lib/schema"
 
 interface Props {
   /** Route, extensionless. Drives the canonical, the breadcrumb and the
@@ -42,7 +49,9 @@ const related = guidesExcept(path)
   jsonLd={[
     guidePage({ path, headline: h1, description }),
     breadcrumbs(path, crumb),
-    faqPage(faqs)
+    faqPage(faqs),
+    softwareApplication(),
+    organization()
   ]}
 >
   <main class="px-6 py-14 md:px-10">

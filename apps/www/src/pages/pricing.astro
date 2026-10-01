@@ -1,13 +1,13 @@
 ---
 import Checkout from "@/components/react/Checkout"
 import Base from "@/layouts/Base.astro"
-import { softwareApplication } from "@/lib/schema"
+import { organization, softwareApplication } from "@/lib/schema"
 ---
 
 <Base
   title="Pricing, $29 one time | Message to PDF"
   description="Message to PDF costs $29 once. No subscription, no account, no license key. 14-day refund, sold through Paddle as Merchant of Record."
-  jsonLd={softwareApplication()}
+  jsonLd={[softwareApplication(), organization()]}
 >
   <main class="px-6 py-16 md:px-10">
     <div class="mx-auto max-w-[46rem]">
