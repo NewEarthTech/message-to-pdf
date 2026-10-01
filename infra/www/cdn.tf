@@ -24,15 +24,36 @@ resource "aws_cloudfront_origin_access_control" "site" {
 # default_root_object only covers "/", not nested paths, which is why this
 # function exists rather than an SPA-style catch-all rewrite: each route is a
 # real document with its own <title>, meta description, and status code.
+#
+# It also keeps every page at one URL. www, a trailing slash, and an explicit
+# index.html all reach the same document, so each of them 301s to the
+# extensionless apex URL that the canonicals and the sitemap name. CloudFront
+# hands the function query string values still percent-encoded, so they are
+# joined back as they arrived, which keeps /success?_ptxn=<txn> intact.
 resource "aws_cloudfront_function" "directory_index" {
   name    = "message-to-pdf-directory-index"
   runtime = "cloudfront-js-2.0"
-  comment = "Append index.html to extensionless paths"
+  comment = "Redirect to the canonical URL, append index.html to extensionless paths"
   publish = true
   code    = <<-JS
     function handler(event) {
       var request = event.request;
       var uri = request.uri;
+      var host = request.headers.host ? request.headers.host.value.toLowerCase().split(':')[0] : '';
+
+      var canonical = uri.replace(/\/index\.html$/, '/').replace(/\/+$/, '') || '/';
+      if (host !== '${var.domain_name}' || canonical !== uri) {
+        return {
+          statusCode: 301,
+          statusDescription: 'Moved Permanently',
+          headers: {
+            location: { value: 'https://${var.domain_name}' + canonical + querystring(request.querystring) },
+            // A 301 with no caching headers can stick in a browser for good;
+            // an hour keeps a mistake here fixable.
+            'cache-control': { value: 'max-age=3600' }
+          }
+        };
+      }
 
       if (uri.charAt(uri.length - 1) === '/') {
         request.uri = uri + 'index.html';
@@ -47,6 +68,17 @@ resource "aws_cloudfront_function" "directory_index" {
       }
 
       return request;
+    }
+
+    function querystring(params) {
+      var pairs = [];
+      for (var name in params) {
+        var values = params[name].multiValue || [params[name]];
+        for (var i = 0; i < values.length; i++) {
+          pairs.push(name + '=' + values[i].value);
+        }
+      }
+      return pairs.length ? '?' + pairs.join('&') : '';
     }
   JS
 }
