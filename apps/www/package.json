@@ -14,13 +14,13 @@
     "check": "biome check . && pnpm run build"
   },
   "dependencies": {
-    "@astrojs/react": "^7.0.0",
+    "@astrojs/react": "^7.0.1",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/inter": "^5.2.9",
     "@msg2pdf/ui": "workspace:*",
     "@paddle/paddle-js": "^1.6.5",
     "@phosphor-icons/react": "^2.1.10",
-    "astro": "^7.3.5",
+    "astro": "^7.3.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "sharp": "^0.35.5"
