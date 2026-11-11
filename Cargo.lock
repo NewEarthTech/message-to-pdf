@@ -2396,9 +2396,9 @@ checksum = "17ab85f84ca42c5ec520e6f3c9966ba1fd62909ce260f8837e248857d2560509"
 
 [[package]]
 name = "kamadak-exif"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1130d80c7374efad55a117d715a3af9368f0fa7a2c54573afc15a188cd984837"
+checksum = "8772c92c0f41c4a672cbdee6728253e5ae8fcc1c5eb5c6c676579565684bbf68"
 dependencies = [
  "mutate_once",
 ]
@@ -4593,9 +4593,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-typed-ipc"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f777cff1a697d4df21e87299ac9ba5cfc2b8f8b88dd26d84faf16df13efa118b"
+checksum = "e9bbfbe412eae8cf70223e6decc53ab6cd2c5e3f210729c809554e6de3fe0871"
 dependencies = [
  "serde",
  "serde_json",
@@ -4609,9 +4609,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-typed-ipc-macros"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36da8fcf0a06b78c15d834f583102418a168da62b01d09d6d9159ec41d98e3a3"
+checksum = "2741e154841628c33cdaed022ce7cb01ca058c7d2cdd521bb88626dab24e96ec"
 dependencies = [
  "proc-macro-crate 3.5.0",
  "proc-macro2",
